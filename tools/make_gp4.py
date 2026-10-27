@@ -8,11 +8,18 @@ import glob
 import sys
 
 def generate_gp4(pkg_dir="pkg", title_id="ORBS00008"):
-    content_id = f"IV0000-{title_id}_00-0000000000000000"
+    content_id = f"IV0000-{title_id}_00-ORBIS8PICO800000"
     
     files = []
-    # Standard mandatory files
-    for base in ["eboot.bin", "sce_sys/param.sfo", "sce_sys/icon0.png"]:
+    # Standard mandatory OpenOrbis PS4 PKG files
+    for base in [
+        "eboot.bin",
+        "sce_sys/about/right.sprx",
+        "sce_sys/param.sfo",
+        "sce_sys/icon0.png",
+        "sce_module/libc.prx",
+        "sce_module/libSceFios2.prx",
+    ]:
         path = os.path.join(pkg_dir, base)
         if os.path.exists(path):
             files.append(base)
@@ -50,7 +57,10 @@ def generate_gp4(pkg_dir="pkg", title_id="ORBS00008"):
     lines.extend([
         '\t</files>',
         '\t<rootdir>',
-        '\t\t<dir targ_name="sce_sys" />',
+        '\t\t<dir targ_name="sce_sys">',
+        '\t\t\t<dir targ_name="about" />',
+        '\t\t</dir>',
+        '\t\t<dir targ_name="sce_module" />',
         '\t\t<dir targ_name="carts" />',
         '\t</rootdir>',
         '</psproject>'

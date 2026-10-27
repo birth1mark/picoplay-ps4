@@ -15,8 +15,9 @@ endif
 
 APP_TITLE       := Orbis8 - PICO-8 Player
 APP_TITLE_ID    := ORBS00008
-APP_VERSION     := 1.00
+APP_VERSION     := 01.00
 APP_AUTHOR      := birth1mark
+CONTENT_ID      := IV0000-$(APP_TITLE_ID)_00-ORBIS8PICO800000
 
 TARGET          := orbis8
 BUILD           := build
@@ -120,13 +121,48 @@ $(EBOOT): $(TARGET).elf
 
 pkg: all
 	@echo "==> Packaging Orbis8 Fake PKG..."
-	@mkdir -p ../../pkg/sce_sys ../../pkg/carts
+	@mkdir -p ../../pkg/sce_sys/about ../../pkg/sce_module ../../pkg/carts
 	@cp -r ../../starter_carts/* ../../pkg/carts/ 2>/dev/null || true
-	@test -f ../../pkg/sce_sys/icon0.png || (which magick >/dev/null 2>&1 && magick ../vita/sce_sys/icon0.png -resize 512x512 ../../pkg/sce_sys/icon0.png) || cp ../vita/sce_sys/icon0.png ../../pkg/sce_sys/icon0.png
+	@test -f ../../pkg/sce_sys/about/right.sprx || cp $(OPENORBIS)/samples/SDL2/sce_sys/about/right.sprx ../../pkg/sce_sys/about/right.sprx
+	@test -f ../../pkg/sce_module/libc.prx || cp $(OPENORBIS)/samples/SDL2/sce_module/libc.prx ../../pkg/sce_module/libc.prx
+	@test -f ../../pkg/sce_module/libSceFios2.prx || cp $(OPENORBIS)/samples/SDL2/sce_module/libSceFios2.prx ../../pkg/sce_module/libSceFios2.prx
+	@if which magick >/dev/null 2>&1; then \
+		magick ../vita/sce_sys/icon0.png -background black -alpha remove -alpha off -resize 512x512 -type TrueColor PNG24:../../pkg/sce_sys/icon0.png; \
+	elif which convert >/dev/null 2>&1; then \
+		convert ../vita/sce_sys/icon0.png -background black -alpha remove -alpha off -resize 512x512 -type TrueColor PNG24:../../pkg/sce_sys/icon0.png; \
+	fi
+	@rm -f ../../pkg/sce_sys/param.sfo
+	@DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
+		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_new ../../pkg/sce_sys/param.sfo && \
+	DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
+		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_setentry ../../pkg/sce_sys/param.sfo APP_TYPE --type Integer --maxsize 4 --value 1 && \
+	DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
+		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_setentry ../../pkg/sce_sys/param.sfo APP_VER --type Utf8 --maxsize 8 --value '$(APP_VERSION)' && \
+	DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
+		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_setentry ../../pkg/sce_sys/param.sfo ATTRIBUTE --type Integer --maxsize 4 --value 0 && \
+	DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
+		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_setentry ../../pkg/sce_sys/param.sfo CATEGORY --type Utf8 --maxsize 4 --value 'gd' && \
+	DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
+		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_setentry ../../pkg/sce_sys/param.sfo CONTENT_ID --type Utf8 --maxsize 48 --value '$(CONTENT_ID)' && \
+	DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
+		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_setentry ../../pkg/sce_sys/param.sfo DOWNLOAD_DATA_SIZE --type Integer --maxsize 4 --value 0 && \
+	DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
+		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_setentry ../../pkg/sce_sys/param.sfo FORMAT --type Utf8 --maxsize 4 --value 'obs' && \
+	DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
+		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_setentry ../../pkg/sce_sys/param.sfo PARENTAL_LEVEL --type Integer --maxsize 4 --value 1 && \
+	DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
+		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_setentry ../../pkg/sce_sys/param.sfo SYSTEM_VER --type Integer --maxsize 4 --value 0 && \
+	DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
+		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_setentry ../../pkg/sce_sys/param.sfo TITLE --type Utf8 --maxsize 128 --value '$(APP_TITLE)' && \
+	DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
+		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_setentry ../../pkg/sce_sys/param.sfo TITLE_ID --type Utf8 --maxsize 12 --value '$(APP_TITLE_ID)' && \
+	DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
+		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_setentry ../../pkg/sce_sys/param.sfo VERSION --type Utf8 --maxsize 8 --value '$(APP_VERSION)' \
+	|| python3 ../../tools/make_sfo.py ../../pkg/sce_sys/param.sfo
 	@cd ../.. && python3 tools/make_gp4.py pkg
 	@cd ../../pkg && DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
 		$(OPENORBIS)/bin/linux/PkgTool.Core pkg_build project.gp4 . && \
-		mv IV0000-ORBS00008_00-0000000000000000.pkg ../$(TARGET).pkg
+		mv $(CONTENT_ID).pkg ../$(TARGET).pkg
 	@echo "==> Sealed Fake PKG ready: $(TARGET).pkg"
 
 clean:

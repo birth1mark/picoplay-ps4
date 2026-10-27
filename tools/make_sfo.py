@@ -7,17 +7,27 @@ import struct
 import sys
 import os
 
-def create_sfo(title_id="ORBS00008", title="Orbis8 - PICO-8 Player by birth1mark", version="01.00"):
+def create_sfo(title_id="ORBS00008", title="Orbis8 - PICO-8 Player", version="01.00"):
+    # SFO Entry Formats:
+    #   0x0404 = Integer (uint32, 4 bytes)
+    #   0x0204 = Utf8 (null-terminated UTF-8 string; val_len = len(str) + 1, padded to max_len in data table)
+    FMT_INT  = 0x0404
+    FMT_UTF8 = 0x0204
+
+    content_id = f"IV0000-{title_id}_00-ORBIS8PICO800000"
     entries = {
-        "APP_TYPE": (2, 4, 1), # uint32
-        "APP_VER": (0, 8, version.ljust(8, '\x00')), # utf8
-        "ATTRIBUTE": (2, 4, 0),
-        "CATEGORY": (0, 4, "gd\x00\x00"),
-        "CONTENT_ID": (0, 36, f"IV0000-{title_id}_00-0000000000000000\x00"),
-        "SYSTEM_VER": (2, 4, 0),
-        "TITLE": (0, 128, title.ljust(128, '\x00')),
-        "TITLE_ID": (0, 12, title_id.ljust(12, '\x00')),
-        "VERSION": (0, 8, version.ljust(8, '\x00')),
+        "APP_TYPE":           (FMT_INT,  4,   1),
+        "APP_VER":            (FMT_UTF8, 8,   version),
+        "ATTRIBUTE":          (FMT_INT,  4,   0),
+        "CATEGORY":           (FMT_UTF8, 4,   "gd"),
+        "CONTENT_ID":         (FMT_UTF8, 48,  content_id),
+        "DOWNLOAD_DATA_SIZE": (FMT_INT,  4,   0),
+        "FORMAT":             (FMT_UTF8, 4,   "obs"),
+        "PARENTAL_LEVEL":     (FMT_INT,  4,   1),
+        "SYSTEM_VER":         (FMT_INT,  4,   0),
+        "TITLE":              (FMT_UTF8, 128, title),
+        "TITLE_ID":           (FMT_UTF8, 12,  title_id),
+        "VERSION":            (FMT_UTF8, 8,   version),
     }
 
     # Sort keys alphabetically as required by SFO specification
@@ -36,15 +46,13 @@ def create_sfo(title_id="ORBS00008", title="Orbis8 - PICO-8 Player by birth1mark
     for k in sorted_keys:
         fmt, max_len, val = entries[k]
         val_offset = len(val_table)
-        if fmt == 2: # uint32
+        if fmt == FMT_INT:
             data = struct.pack('<I', val)
             val_len = 4
-        else: # string
-            if isinstance(val, str):
-                data = val.encode('utf-8')[:max_len]
-            else:
-                data = val[:max_len]
-            val_len = len(data)
+        else:
+            raw = val.encode('utf-8')[:max_len - 1]
+            val_len = len(raw) + 1
+            data = raw + (b'\x00' * (max_len - len(raw)))
         val_table.extend(data)
         val_entries.append((key_offsets[k], fmt, val_len, max_len, val_offset))
 
@@ -70,7 +78,7 @@ def create_sfo(title_id="ORBS00008", title="Orbis8 - PICO-8 Player by birth1mark
 
     entry_bytes = bytearray()
     for key_off, fmt, val_len, max_len, val_off in val_entries:
-        entry_bytes.extend(struct.pack('<HHIII', key_off, (fmt << 8) | 0x04, val_len, max_len, val_off))
+        entry_bytes.extend(struct.pack('<HHIII', key_off, fmt, val_len, max_len, val_off))
 
     return header + entry_bytes + key_table + val_table
 
