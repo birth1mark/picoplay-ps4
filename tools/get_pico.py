@@ -9,7 +9,7 @@ import re
 import urllib.request
 
 USER_AGENT = "PicoPlay/1.0 (Homebrew by birth1mark)"
-DEST_DIR = os.path.expanduser("~/p8carts")
+DEST_DIR = os.path.expanduser("~/picoplay/carts")
 
 def get_cart_url(lid):
     lid = str(lid).strip()

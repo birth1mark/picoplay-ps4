@@ -51,7 +51,7 @@ The arcade frontend is designed to be streamlined, distraction-free, and 100% fa
   - On PS4 (`__ORBIS__` / `__PS4__`): Uses native Sony `SceHttp` / `SceNet` / `SceSsl` / `SceSysmodule` functions.
   - On Desktop (Linux/PC): Uses `libcurl`.
 - **Validation:** Downloaded files are verified with magic byte checks (`\x89PNG` for PNG-carts or `pico-8` header for `.p8`).
-- **Storage:** Downloaded cartridges are saved directly to `/data/picoplay/carts/` on PS4, or `~/p8carts/` on PC.
+- **Storage:** Downloaded cartridges are saved directly to `/data/picoplay/carts/` on PS4, or `~/picoplay/carts/` on PC.
 
 ---
 
@@ -62,8 +62,8 @@ The arcade frontend is designed to be streamlined, distraction-free, and 100% fa
 | `/data/picoplay/carts/` | Downloaded / user-added cartridges | Read/Write (Internal HDD) |
 | `/data/picoplay/cdata/` | Cartridge persistent save data & high scores | Read/Write (Internal HDD) |
 | `/app0/carts/` | Starter cartridges bundled with PKG | Read-Only (Sandbox) |
-| `/mnt/usb0/pico8/` | External USB cartridges (Port 0) | Read-Only (External Drive) |
-| `/mnt/usb1/pico8/` | External USB cartridges (Port 1) | Read-Only (External Drive) |
+| `/mnt/usb0/picoplay/` | External USB cartridges (Port 0) | Read-Only (External Drive) |
+| `/mnt/usb1/picoplay/` | External USB cartridges (Port 1) | Read-Only (External Drive) |
 
 ---
 

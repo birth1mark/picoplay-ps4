@@ -17,7 +17,7 @@ __lua__
 --all themes
 
 --start customizable per platform
-cartpath = "sdmc:/p8carts/"
+cartpath = "/data/picoplay/carts/"
 selectbtn = "a"
 pausebtn = "start"
 versionstr = ")#" VER_STR  R"#("
@@ -315,7 +315,7 @@ function draw_cart_card(cx, cy, filename, is_selected)
 	print(cleanname, cx + 28 - (#cleanname * 2), cy + 15, 0)
 
 	-- Fantasy console branding
-	print("PICO-8", cx + 16, cy + 24, 5)
+	print("PICOPLAY", cx + 12, cy + 24, 5)
 
 	-- Bottom gold connector contacts
 	rectfill(cx + 10, cy + 37, cx + 45, cy + 38, 0)

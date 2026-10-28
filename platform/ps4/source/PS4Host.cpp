@@ -291,8 +291,8 @@ vector<string> Host::listcarts() {
     const char* scanDirs[] = {
         _cartDirectory.c_str(),
         "/app0/carts",
-        "/mnt/usb0/pico8",
-        "/mnt/usb1/pico8"
+        "/mnt/usb0/picoplay",
+        "/mnt/usb1/picoplay"
     };
 
     for (const char* dirPath : scanDirs) {

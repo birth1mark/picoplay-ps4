@@ -203,7 +203,7 @@ Cartridges on the Lexaloffle BBS are stored deterministically on the public CDN 
 ### Storage and Caching Pipeline
 1. Client issues HTTP `GET` with header `User-Agent: PicoPlay/1.0 (PS4 Homebrew by birth1mark)`.
 2. Validates HTTP 200 response and tests for the valid `\x89PNG` header signature.
-3. Caches directly to `/data/picoplay/carts/{lid}.p8.png` (PS4) or `~/p8carts/` (PC).
+3. Caches directly to `/data/picoplay/carts/{lid}.p8.png` (PS4) or `~/picoplay/carts/` (PC).
 4. Reloads the cart list and hot-launches the game into memory.
 
 ### Lua Host API Bindings

@@ -37,7 +37,7 @@ SDL_Event event;
 
 string _desktopSdl2SettingsDir = "picoplay";
 string _desktopSdl2SettingsPrefix = "picoplay/";
-string _desktopSdl2customBiosLua = "cartpath = \"~/p8carts/\"\n"
+string _desktopSdl2customBiosLua = "cartpath = \"~/picoplay/carts/\"\n"
         "selectbtn = \"z\"\n"
         "pausebtn = \"esc\"\n"
         "exitbtn = \"close window\"\n"
@@ -76,6 +76,11 @@ Host::Host(int windowWidth, int windowHeight)
     if (res == 0 && stat(cartdatadir.c_str(), &st) == -1) {
         res = mkdir(cartdatadir.c_str(), 0777);
     }
+
+    string cartsdir = _desktopSdl2SettingsPrefix + "carts";
+    if (stat(cartsdir.c_str(), &st) == -1) {
+        mkdir(cartsdir.c_str(), 0777);
+    }
 	
 	#if KB_ENABLED
 	SDL_StartTextInput();
@@ -83,7 +88,7 @@ Host::Host(int windowWidth, int windowHeight)
 
     std::string home = getenv("HOME");
     
-    std::string fullCartDir = home + "/p8carts";
+    std::string fullCartDir = home + "/picoplay/carts";
 
     setPlatformParams(
         WINDOW_SIZE_X,

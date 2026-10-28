@@ -48,7 +48,7 @@ Pre-built packages are ready to install on any jailbroken PlayStation 4 running 
 - **In-App Lexaloffle BBS Store:** Browse, search and download community cartridges directly inside the application with 1-click download & play!
 - **Native 1080p Output:** Crisp integer scaling with selectable aspect ratios.
 - **Full DualShock 4 Integration:** Seamless mapping for D-Pad, Left Analog Stick, Face Buttons, and tactile controls.
-- **Plug-and-Play USB Loading:** Automatically scans and launches `.p8` and `.p8.png` cartridges from USB drives (`/mnt/usb0/pico8/`).
+- **Plug-and-Play USB Loading:** Automatically scans and launches `.p8` and `.p8.png` cartridges from USB drives (`/mnt/usb0/picoplay/`).
 - **Starter Classics Included:** Ships pre-bundled with open-source masterpieces ready to play without configuration.
 - **Persistent Save States:** Cartridge data and high scores automatically save to `/data/picoplay/cdata/`.
 - **Homebrew Store / PKG-Zone Compliant:** Built 100% clean-room with the community OpenOrbis toolchain (no copyrighted Sony SDK components).
@@ -77,9 +77,9 @@ You can easily add new PICO-8 cartridges using any of the following methods:
    Press **Circle (◯)** in the arcade menu to switch to the **🌐 BBS Store**! Browse curated community games (*Celeste 2*, *Slipways*, *Mistigri*, *Mai-Chan*, *Hellspawn*, *Dank Tomb*, etc.) or enter any custom cart ID. Press **Cross (✕)** to download and play immediately!
 
 2. **USB Drive:**
-   Create a folder named `pico8` on the root of your USB flash drive:
+   Create a folder named `picoplay` on the root of your USB flash drive:
    ```text
-   USB Drive -> /pico8/my_game.p8.png
+   USB Drive -> /picoplay/my_game.p8.png
    ```
    Plug it into your PS4. **PicoPlay** will detect and index your carts immediately!
 

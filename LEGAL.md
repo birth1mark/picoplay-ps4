@@ -50,7 +50,7 @@ Under the terms of the MIT License:
    User-Agent: PicoPlay/1.0 (PS4 Homebrew by birth1mark)
    ```
 3. **No Aggressive Scraping:** Cartridges are only fetched individually upon explicit user request. **PicoPlay** never mass-scrapes or floods the Lexaloffle servers.
-4. **Local Persistent Caching:** Once a cartridge is downloaded, it is permanently cached to local storage (`/data/picoplay/carts/` on PS4 or `~/p8carts/` on PC), preventing redundant requests.
+4. **Local Persistent Caching:** Once a cartridge is downloaded, it is permanently cached to local storage (`/data/picoplay/carts/` on PS4 or `~/picoplay/carts/` on PC), preventing redundant requests.
 
 ---
 

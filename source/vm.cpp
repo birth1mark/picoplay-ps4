@@ -455,7 +455,7 @@ bool Vm::LoadCart(std::string filename, bool loadBiosOnFail){
 
 #if !defined(__PS4__) && !defined(__ORBIS__)
     // If the filename is an absolute path on desktop/handhelds, update the cart directory.
-    // On PS4, keep _cartDirectory pointed to writable /data/pico8-ps4/carts so BBS downloads
+    // On PS4, keep _cartDirectory pointed to writable /data/picoplay/carts so BBS downloads
     // never attempt to write into read-only /app0/carts or USB mounts.
     if (isAbsolutePath(filename)) {
         std::string dir = getDirectory(filename);
