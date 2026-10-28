@@ -220,7 +220,9 @@ end
 function _draw()
 	cls()
 	rectfill(0,0,128,128,1)
-	spr(0,1,1,5,1)
+	rectfill(0,0,127,10,0)
+	line(0,11,127,11,12)
+	print("PICO-8 PS4 SETTINGS",26,3,7)
 	
 
 	color(7)

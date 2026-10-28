@@ -52,7 +52,7 @@ platform/libretro/obj/
 # PS4 build artifacts
 *.oelf
 *.pkg
-orbis8
+pico8-ps4
 platform/ps4/build/
 platform/ps4/eboot.bin
 platform/ps4/*.oelf
@@ -60,7 +60,7 @@ pkg/eboot.bin
 
 # Desktop build artifacts
 platform/SDL2Desktop/build/
-orbis8-*.tar.gz
+pico8-ps4-*.tar.gz
 
 .DS_Store
 

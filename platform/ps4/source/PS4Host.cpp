@@ -305,15 +305,18 @@ vector<string> Host::listcarts() {
         closedir(dir);
     }
 
-    // Also scan bundled application carts (/app0/carts)
-    if (_cartDirectory != "/app0/carts" && (dir = opendir("/app0/carts")) != NULL) {
-        while ((ent = readdir(dir)) != NULL) {
-            if (ent->d_name[0] == '.') continue;
-            if (isCartFile(ent->d_name)) {
-                carts.push_back(string("/app0/carts/") + ent->d_name);
+    // Also scan bundled application carts (/app0/carts) and legacy (/data/orbis8/carts)
+    const char* extraCartDirs[] = { "/app0/carts", "/data/orbis8/carts" };
+    for (const char* extraDir : extraCartDirs) {
+        if (_cartDirectory != extraDir && (dir = opendir(extraDir)) != NULL) {
+            while ((ent = readdir(dir)) != NULL) {
+                if (ent->d_name[0] == '.') continue;
+                if (isCartFile(ent->d_name)) {
+                    carts.push_back(string(extraDir) + "/" + ent->d_name);
+                }
             }
+            closedir(dir);
         }
-        closedir(dir);
     }
 
     // Also scan USB storage if not already scanned
