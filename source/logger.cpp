@@ -16,8 +16,8 @@ void Logger_Initialize(const char* pathPrefix)
     #if LOGGER_ENABLED
     std::string buf(pathPrefix);
     buf.append("pico.log");
-    m_file = freopen(buf.c_str(), "w", stderr);
-    m_enabled = true;
+    m_file = fopen(buf.c_str(), "w");
+    m_enabled = (m_file != nullptr);
     #endif
 }
 

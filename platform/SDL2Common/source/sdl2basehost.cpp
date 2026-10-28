@@ -189,22 +189,40 @@ void Host::setPlatformParams(
 
 
 void Host::oneTimeSetup(Audio* audio){
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+#if defined(__PS4__) || defined(__ORBIS__)
+    uint32_t initFlags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_TIMER | SDL_INIT_EVENTS;
+#else
+    uint32_t initFlags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER | SDL_INIT_EVENTS;
+#endif
+    if (SDL_Init(initFlags) != 0)
     {
-        fprintf(stderr, "SDL could not initialize\n");
+        Logger_Write("SDL could not initialize: %s\n", SDL_GetError());
         return;
     }
 
+#if defined(__PS4__) || defined(__ORBIS__)
+    window = SDL_CreateWindow("Orbis8 - PICO-8 Player", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowWidth, _windowHeight, _windowFlags);
+#else
     window = SDL_CreateWindow("Orbis8 - PICO-8 Player", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _windowWidth, _windowHeight, _windowFlags);
+#endif
 	if (!window) 
     { 
+        Logger_Write("Error creating window: %s\n", SDL_GetError());
         quit = 1;
         return; 
     }
 	
 	renderer = SDL_CreateRenderer(window, -1, _rendererFlags);
+    if (!renderer)
+    {
+        SDL_Surface* windowSurface = SDL_GetWindowSurface(window);
+        if (windowSurface) {
+            renderer = SDL_CreateSoftwareRenderer(windowSurface);
+        }
+    }
 	if (!renderer) 
     { 
+        Logger_Write("Error creating renderer: %s\n", SDL_GetError());
         quit = 1;
         return;
     }
@@ -212,7 +230,7 @@ void Host::oneTimeSetup(Audio* audio){
     texture = SDL_CreateTexture(renderer, _pixelFormat, SDL_TEXTUREACCESS_STREAMING, PicoScreenWidth, PicoScreenHeight);
     if (!texture)
     {
-        fprintf(stderr, "Error creating texture.\n");
+        Logger_Write("Error creating texture: %s\n", SDL_GetError());
         quit = 1;
         return;
     }
@@ -225,8 +243,7 @@ void Host::oneTimeSetup(Audio* audio){
     joystickCount = SDL_NumJoysticks();
     for (int i = 0; i < joystickCount; i++) {
 		if (SDL_JoystickOpen(i) == NULL) {
-			printf("Failed to open joystick %d!\n", i);
-			quit = 1;
+			Logger_Write("Failed to open joystick %d: %s\n", i, SDL_GetError());
 		}
     }
 

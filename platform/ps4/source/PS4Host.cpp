@@ -24,13 +24,36 @@ using namespace std;
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_gamecontroller.h>
+#include <orbis/Pad.h>
+#include <orbis/UserService.h>
 
 #define WINDOW_SIZE_X 1920
 #define WINDOW_SIZE_Y 1080
 
-#define WINDOW_FLAGS SDL_WINDOW_FULLSCREEN_DESKTOP
-#define RENDERER_FLAGS (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)
+// OpenOrbis SDL2 requires the software renderer (PS4_CreateRenderer is a stub)
+#define WINDOW_FLAGS 0
+#define RENDERER_FLAGS SDL_RENDERER_SOFTWARE
 #define PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888
+
+// OpenOrbis SDL_sysjoystick.c DualShock 4 button indices (SDL_JOYBUTTONDOWN / SDL_JOYBUTTONUP)
+enum OrbisSdlJoyButton {
+    PS4_JOY_BTN_CROSS     = 0,
+    PS4_JOY_BTN_CIRCLE    = 1,
+    PS4_JOY_BTN_SQUARE    = 2,
+    PS4_JOY_BTN_TRIANGLE  = 3,
+    PS4_JOY_BTN_L1        = 4,
+    PS4_JOY_BTN_R1        = 5,
+    PS4_JOY_BTN_OPTIONS   = 9,
+    PS4_JOY_BTN_L3        = 11,
+    PS4_JOY_BTN_R3        = 12,
+    PS4_JOY_BTN_DPAD_UP   = 13,
+    PS4_JOY_BTN_DPAD_DOWN = 14,
+    PS4_JOY_BTN_DPAD_LEFT = 15,
+    PS4_JOY_BTN_DPAD_RIGHT= 16,
+    PS4_JOY_BTN_TOUCHPAD  = 17,
+    PS4_JOY_BTN_L2        = 18,
+    PS4_JOY_BTN_R2        = 19
+};
 
 // DualShock 4 button mappings for SDL_CONTROLLER_BUTTON
 #define DS4_BTN_CROSS       SDL_CONTROLLER_BUTTON_A
@@ -46,14 +69,15 @@ using namespace std;
 #define DS4_BTN_DPAD_LEFT   SDL_CONTROLLER_BUTTON_DPAD_LEFT
 #define DS4_BTN_DPAD_RIGHT  SDL_CONTROLLER_BUTTON_DPAD_RIGHT
 
-// Analog joystick dead zone
-const int JOYSTICK_DEAD_ZONE = 8000;
+// Analog joystick dead zone (0..255 centered at 128 -> deadzone 32 around 128)
+const int PAD_STICK_DEAD_ZONE = 32;
 static int jxDir = 0;
 static int jyDir = 0;
+static int ps4PadHandle = -1;
+static uint32_t prevPadButtons = 0;
 
 static SDL_Event event;
 static SDL_Point touchLocation = { 128 / 2, 128 / 2 };
-static SDL_GameController* controller = NULL;
 
 static string _ps4SettingsDir = "/data/orbis8";
 static string _ps4SettingsPrefix = "/data/orbis8/";
@@ -85,19 +109,6 @@ Host::Host(int windowWidth, int windowHeight) {
         _ps4CartDir = "/mnt/usb1/pico8";
     }
 
-    // Initialize GameController subsystem
-    if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0) {
-        for (int i = 0; i < SDL_NumJoysticks(); ++i) {
-            if (SDL_IsGameController(i)) {
-                controller = SDL_GameControllerOpen(i);
-                if (controller) {
-                    Logger_Write("Connected GameController: %s\n", SDL_GameControllerName(controller));
-                    break;
-                }
-            }
-        }
-    }
-
     setPlatformParams(
         WINDOW_SIZE_X,
         WINDOW_SIZE_Y,
@@ -120,6 +131,37 @@ InputState_t Host::scanInput() {
 
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
+            case SDL_JOYBUTTONDOWN:
+                switch (event.jbutton.button) {
+                    case PS4_JOY_BTN_OPTIONS:    currKDown |= P8_KEY_PAUSE; break;
+                    case PS4_JOY_BTN_DPAD_LEFT:  currKDown |= P8_KEY_LEFT;  break;
+                    case PS4_JOY_BTN_DPAD_RIGHT: currKDown |= P8_KEY_RIGHT; break;
+                    case PS4_JOY_BTN_DPAD_UP:    currKDown |= P8_KEY_UP;    break;
+                    case PS4_JOY_BTN_DPAD_DOWN:  currKDown |= P8_KEY_DOWN;  break;
+                    case PS4_JOY_BTN_CROSS:      currKDown |= P8_KEY_X;     break;
+                    case PS4_JOY_BTN_CIRCLE:     currKDown |= P8_KEY_O;     break;
+                    case PS4_JOY_BTN_SQUARE:     currKDown |= P8_KEY_O;     break;
+                    case PS4_JOY_BTN_TRIANGLE:   stretchKeyPressed = true;  break;
+                    case PS4_JOY_BTN_L1:         lDown = true;              break;
+                    case PS4_JOY_BTN_R1:         rDown = true;              break;
+                }
+                break;
+
+            case SDL_JOYBUTTONUP:
+                switch (event.jbutton.button) {
+                    case PS4_JOY_BTN_OPTIONS:    kUp |= P8_KEY_PAUSE; break;
+                    case PS4_JOY_BTN_DPAD_LEFT:  kUp |= P8_KEY_LEFT;  break;
+                    case PS4_JOY_BTN_DPAD_RIGHT: kUp |= P8_KEY_RIGHT; break;
+                    case PS4_JOY_BTN_DPAD_UP:    kUp |= P8_KEY_UP;    break;
+                    case PS4_JOY_BTN_DPAD_DOWN:  kUp |= P8_KEY_DOWN;  break;
+                    case PS4_JOY_BTN_CROSS:      kUp |= P8_KEY_X;     break;
+                    case PS4_JOY_BTN_CIRCLE:     kUp |= P8_KEY_O;     break;
+                    case PS4_JOY_BTN_SQUARE:     kUp |= P8_KEY_O;     break;
+                    case PS4_JOY_BTN_L1:         lDown = false;       break;
+                    case PS4_JOY_BTN_R1:         rDown = false;       break;
+                }
+                break;
+
             case SDL_CONTROLLERBUTTONDOWN:
                 switch (event.cbutton.button) {
                     case DS4_BTN_OPTIONS:    currKDown |= P8_KEY_PAUSE; break;
@@ -127,10 +169,10 @@ InputState_t Host::scanInput() {
                     case DS4_BTN_DPAD_RIGHT: currKDown |= P8_KEY_RIGHT; break;
                     case DS4_BTN_DPAD_UP:    currKDown |= P8_KEY_UP;    break;
                     case DS4_BTN_DPAD_DOWN:  currKDown |= P8_KEY_DOWN;  break;
-                    case DS4_BTN_CROSS:      currKDown |= P8_KEY_X;     break; // 🅾 button
-                    case DS4_BTN_CIRCLE:     currKDown |= P8_KEY_O;     break; // ❎ button
-                    case DS4_BTN_SQUARE:     currKDown |= P8_KEY_O;     break; // Alternate action
-                    case DS4_BTN_TRIANGLE:   stretchKeyPressed = true;  break; // Toggle screen scaling
+                    case DS4_BTN_CROSS:      currKDown |= P8_KEY_X;     break;
+                    case DS4_BTN_CIRCLE:     currKDown |= P8_KEY_O;     break;
+                    case DS4_BTN_SQUARE:     currKDown |= P8_KEY_O;     break;
+                    case DS4_BTN_TRIANGLE:   stretchKeyPressed = true;  break;
                     case DS4_BTN_L1:         lDown = true;              break;
                     case DS4_BTN_R1:         rDown = true;              break;
                 }
@@ -151,29 +193,55 @@ InputState_t Host::scanInput() {
                 }
                 break;
 
-            case SDL_CONTROLLERAXISMOTION:
-                if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTX) {
-                    if (event.caxis.value < -JOYSTICK_DEAD_ZONE) {
-                        jxDir = -1;
-                    } else if (event.caxis.value > JOYSTICK_DEAD_ZONE) {
-                        jxDir = 1;
-                    } else {
-                        jxDir = 0;
-                    }
-                } else if (event.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY) {
-                    if (event.caxis.value < -JOYSTICK_DEAD_ZONE) {
-                        jyDir = -1;
-                    } else if (event.caxis.value > JOYSTICK_DEAD_ZONE) {
-                        jyDir = 1;
-                    } else {
-                        jyDir = 0;
-                    }
-                }
-                break;
-
             case SDL_QUIT:
                 quit = 1;
                 break;
+        }
+    }
+
+    // Read DualShock 4 state directly via scePadReadState (guarantees analog stick & buttons work on PS4)
+    if (ps4PadHandle < 0) {
+        OrbisUserServiceUserId userId = ORBIS_USER_SERVICE_USER_ID_INVALID;
+        if (sceUserServiceGetInitialUser(&userId) == 0 && userId != ORBIS_USER_SERVICE_USER_ID_INVALID) {
+            ps4PadHandle = scePadGetHandle(userId, 0, 0);
+            if (ps4PadHandle < 0) {
+                ps4PadHandle = scePadOpen(userId, 0, 0, NULL);
+            }
+        }
+    }
+    if (ps4PadHandle >= 0) {
+        OrbisPadData padData;
+        memset(&padData, 0, sizeof(padData));
+        if (scePadReadState(ps4PadHandle, &padData) == 0 && padData.connected) {
+            int lx = (int)padData.leftStick.x - 128;
+            int ly = (int)padData.leftStick.y - 128;
+            jxDir = (lx < -PAD_STICK_DEAD_ZONE) ? -1 : ((lx > PAD_STICK_DEAD_ZONE) ? 1 : 0);
+            jyDir = (ly < -PAD_STICK_DEAD_ZONE) ? -1 : ((ly > PAD_STICK_DEAD_ZONE) ? 1 : 0);
+
+            uint32_t btns = padData.buttons;
+            uint32_t justPressed = btns & ~prevPadButtons;
+            uint32_t justReleased = ~btns & prevPadButtons;
+            prevPadButtons = btns;
+
+            if (justPressed & ORBIS_PAD_BUTTON_OPTIONS)  currKDown |= P8_KEY_PAUSE;
+            if (justPressed & ORBIS_PAD_BUTTON_LEFT)     currKDown |= P8_KEY_LEFT;
+            if (justPressed & ORBIS_PAD_BUTTON_RIGHT)    currKDown |= P8_KEY_RIGHT;
+            if (justPressed & ORBIS_PAD_BUTTON_UP)       currKDown |= P8_KEY_UP;
+            if (justPressed & ORBIS_PAD_BUTTON_DOWN)     currKDown |= P8_KEY_DOWN;
+            if (justPressed & ORBIS_PAD_BUTTON_CROSS)    currKDown |= P8_KEY_X;
+            if (justPressed & (ORBIS_PAD_BUTTON_CIRCLE | ORBIS_PAD_BUTTON_SQUARE)) currKDown |= P8_KEY_O;
+            if (justPressed & ORBIS_PAD_BUTTON_TRIANGLE) stretchKeyPressed = true;
+
+            if (justReleased & ORBIS_PAD_BUTTON_OPTIONS) kUp |= P8_KEY_PAUSE;
+            if (justReleased & ORBIS_PAD_BUTTON_LEFT)    kUp |= P8_KEY_LEFT;
+            if (justReleased & ORBIS_PAD_BUTTON_RIGHT)   kUp |= P8_KEY_RIGHT;
+            if (justReleased & ORBIS_PAD_BUTTON_UP)      kUp |= P8_KEY_UP;
+            if (justReleased & ORBIS_PAD_BUTTON_DOWN)    kUp |= P8_KEY_DOWN;
+            if (justReleased & ORBIS_PAD_BUTTON_CROSS)   kUp |= P8_KEY_X;
+            if (justReleased & (ORBIS_PAD_BUTTON_CIRCLE | ORBIS_PAD_BUTTON_SQUARE)) kUp |= P8_KEY_O;
+
+            lDown = (btns & ORBIS_PAD_BUTTON_L1) != 0;
+            rDown = (btns & ORBIS_PAD_BUTTON_R1) != 0;
         }
     }
 
@@ -183,7 +251,7 @@ InputState_t Host::scanInput() {
     }
 
     currKHeld |= currKDown;
-    currKHeld ^= kUp;
+    currKHeld &= ~kUp;
 
     // Analog stick mapped to D-pad inputs
     if (jxDir > 0) {

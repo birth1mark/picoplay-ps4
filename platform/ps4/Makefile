@@ -126,11 +126,7 @@ pkg: all
 	@test -f ../../pkg/sce_sys/about/right.sprx || cp $(OPENORBIS)/samples/SDL2/sce_sys/about/right.sprx ../../pkg/sce_sys/about/right.sprx
 	@test -f ../../pkg/sce_module/libc.prx || cp $(OPENORBIS)/samples/SDL2/sce_module/libc.prx ../../pkg/sce_module/libc.prx
 	@test -f ../../pkg/sce_module/libSceFios2.prx || cp $(OPENORBIS)/samples/SDL2/sce_module/libSceFios2.prx ../../pkg/sce_module/libSceFios2.prx
-	@if which magick >/dev/null 2>&1; then \
-		magick ../vita/sce_sys/icon0.png -background black -alpha remove -alpha off -resize 512x512 -type TrueColor PNG24:../../pkg/sce_sys/icon0.png; \
-	elif which convert >/dev/null 2>&1; then \
-		convert ../vita/sce_sys/icon0.png -background black -alpha remove -alpha off -resize 512x512 -type TrueColor PNG24:../../pkg/sce_sys/icon0.png; \
-	fi
+	@cp sce_sys/icon0.png ../../pkg/sce_sys/icon0.png
 	@rm -f ../../pkg/sce_sys/param.sfo
 	@DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 LD_LIBRARY_PATH=$(HOME)/toolchains/lib:$$LD_LIBRARY_PATH \
 		$(OPENORBIS)/bin/linux/PkgTool.Core sfo_new ../../pkg/sce_sys/param.sfo && \
