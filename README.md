@@ -9,6 +9,8 @@
 
 **PicoPlay** brings the magical world of PICO-8 indie retrogaming natively to the PlayStation 4. Powered by an optimized C++ SDL2 engine, it delivers pixel-perfect 60 FPS gameplay, full DualShock 4 controller integration, an in-app BBS Store to download cartridges on-the-fly, and an out-of-the-box arcade experience with celebrated community titles like *Celeste Classic*.
 
+> 📱 **Also Available on Android:** Looking for the mobile & handheld edition? Check out [**PicoPlay Android (`birth1mark/picoplay-android`)**](https://github.com/birth1mark/picoplay-android) with a custom Pocket Touch Gamepad, Bluetooth controller support, and Google Play Store compliance.
+
 ---
 
 ## 📸 Screenshots
