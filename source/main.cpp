@@ -86,12 +86,12 @@ int main(int argc, char* argv[])
 
 	if (!downloadLid.empty()) {
 		std::string filename = "bbs_" + downloadLid + ".p8.png";
-		printf("[PICO-8 PS4] Downloading cartridge '%s' from Lexaloffle BBS...\n", downloadLid.c_str());
+		printf("[PicoPlay] Downloading cartridge '%s' from Lexaloffle BBS...\n", downloadLid.c_str());
 		if (BBSClient::DownloadCartByLid(downloadLid, filename, host->getCartDirectory())) {
 			cart = strdup(filename.c_str());
 			loadCart = true;
 		} else {
-			printf("[PICO-8 PS4] Failed to download cartridge '%s' from BBS.\n", downloadLid.c_str());
+			printf("[PicoPlay] Failed to download cartridge '%s' from BBS.\n", downloadLid.c_str());
 		}
 	}
 

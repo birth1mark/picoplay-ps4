@@ -1,6 +1,6 @@
-# PICO-8 PS4 Architecture & Technical Deep-Dive 🔬
+# PicoPlay Architecture & Technical Deep-Dive 🔬
 
-**PICO-8 PS4** is a native, high-performance PICO-8 fantasy console interpreter and runtime environment engineered for the PlayStation 4 (via the OpenOrbis toolchain) and modern desktop systems.
+**PicoPlay** is a native, high-performance PICO-8 fantasy console interpreter and runtime environment engineered for the PlayStation 4 (via the OpenOrbis toolchain) and modern desktop systems.
 
 This document serves as an in-depth technical manual detailing the internal memory architecture, virtual machine pipeline, audio synthesis, graphics subsystem, input abstraction, and cross-platform compilation target.
 
@@ -8,7 +8,7 @@ This document serves as an in-depth technical manual detailing the internal memo
 
 ## 🏛️ System Overview
 
-**PICO-8 PS4** operates by faithfully emulating the constraints, timing, and memory layout of the PICO-8 fantasy console while taking full advantage of the host hardware's native CPU and GPU capabilities.
+**PicoPlay** operates by faithfully emulating the constraints, timing, and memory layout of the PICO-8 fantasy console while taking full advantage of the host hardware's native CPU and GPU capabilities.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -54,7 +54,7 @@ This document serves as an in-depth technical manual detailing the internal memo
 
 ## 💾 Memory Architecture (`PicoRam`)
 
-The PICO-8 virtual machine is defined by a strictly memory-mapped 64KB (0x10000) address space. In **PICO-8 PS4**, this is managed in `PicoRam.h` and accessed via fast inline pointer lookups and bitwise operations.
+The PICO-8 virtual machine is defined by a strictly memory-mapped 64KB (0x10000) address space. In **PicoPlay**, this is managed in `PicoRam.h` and accessed via fast inline pointer lookups and bitwise operations.
 
 ### Memory Map Layout
 
@@ -104,7 +104,7 @@ PICO-8 does not use standard IEEE 754 floating-point arithmetic. Instead, it uti
   ```
 
 ### PICO-8 Lua Syntactic Extensions
-The Lua compiler in **PICO-8 PS4** contains a preprocessor and customized lexer that converts PICO-8 dialect extensions into standard executable bytecode:
+The Lua compiler in **PicoPlay** contains a preprocessor and customized lexer that converts PICO-8 dialect extensions into standard executable bytecode:
 1. **Shorthand `if` expressions:** `if (x < 10) x += 1 y -= 2` becomes `if (x < 10) then x = x + 1; y = y - 2; end`.
 2. **Compound Assignment Operators:** `+=`, `-=`, `*=`, `/=`, `%=`, `&=`, `|=`, `^^=`, `<<=`, `>>=`.
 3. **Unary Peek / Poke Shorthands:**
@@ -140,7 +140,7 @@ The native PICO-8 canvas is 128x128 pixels. On the PlayStation 4, this is scaled
 
 ## 🔊 Audio Synthesis Engine (`Audio.cpp`)
 
-**PICO-8 PS4** implements a real-time, 4-channel software synthesizer running at 22,050 Hz or 44,100 Hz output:
+**PicoPlay** implements a real-time, 4-channel software synthesizer running at 22,050 Hz or 44,100 Hz output:
 
 ### 1. Channels & Polyphony
 - **4 Simultaneous Monophonic Channels** (Channel 0 to 3).
@@ -186,7 +186,7 @@ L1 + R1 + Options               ───►    Host Action  : Force Return to P
 
 ## 🌐 Network Subsystem & BBS Client (`source/BBSClient.cpp`)
 
-To allow playing community cartridges without manual USB transfers, **PICO-8 PS4** includes an integrated BBS Downloader powered by Sony `SceHttp`/`SceSsl` on PS4 and `libcurl` on Desktop.
+To allow playing community cartridges without manual USB transfers, **PicoPlay** includes an integrated BBS Downloader powered by Sony `SceHttp`/`SceSsl` on PS4 and `libcurl` on Desktop.
 
 ### Lexaloffle CDN Formula
 Cartridges on the Lexaloffle BBS are stored deterministically on the public CDN using their unique Post ID / Local ID (`lid`):
@@ -201,13 +201,13 @@ Cartridges on the Lexaloffle BBS are stored deterministically on the public CDN 
   ```
 
 ### Storage and Caching Pipeline
-1. Client issues HTTP `GET` with header `User-Agent: PICO8-PS4/1.0 (PS4 Homebrew by birth1mark)`.
+1. Client issues HTTP `GET` with header `User-Agent: PicoPlay/1.0 (PS4 Homebrew by birth1mark)`.
 2. Validates HTTP 200 response and tests for the valid `\x89PNG` header signature.
-3. Caches directly to `/data/pico8-ps4/carts/{lid}.p8.png` (PS4) or `~/p8carts/` (PC).
+3. Caches directly to `/data/picoplay/carts/{lid}.p8.png` (PS4) or `~/p8carts/` (PC).
 4. Reloads the cart list and hot-launches the game into memory.
 
 ### Lua Host API Bindings
-**PICO-8 PS4** exposes dedicated secure C++ bindings to the Arcade BIOS Lua environment:
+**PicoPlay** exposes dedicated secure C++ bindings to the Arcade BIOS Lua environment:
 - `__bbs_listfeatured()`: Returns an indexed table of curated community games (`{id, title, author, cat, file, downloaded}`).
 - `__bbs_download(lid, filename)`: Downloads a cartridge, verifies PNG magic bytes, and saves locally.
 - `__bbs_isdownloaded(filename)`: Returns whether the given cartridge is already present on local storage.
@@ -221,9 +221,9 @@ Cartridges on the Lexaloffle BBS are stored deterministically on the public CDN 
 - **Compiler:** Clang/LLVM for `x86_64-pc-freebsd12-elf` with `-D__ORBIS__ -D__PS4__ -fPIC`.
 - **Linker:** `ld.lld` linking with `-m elf_x86_64 -pie` against OpenOrbis `libc`, `libkernel`, `libScePad`, `libSceVideoOut`, `libSceAudioOut`, `libSceHttp`, and `libSDL2`.
 - **Binary Conversion:** `create-fself` translates the ELF into a self-contained PlayStation 4 executable (`eboot.bin`).
-- **Packaging:** `PkgTool.Core` and `tools/make_sfo.py` build the binary `param.sfo` containing metadata, Category `gd` (Game Application), and Title ID `PICO00008`, sealing `pico8-ps4.pkg`.
+- **Packaging:** `PkgTool.Core` and `tools/make_sfo.py` build the binary `param.sfo` containing metadata, Category `gd` (Game Application), and Title ID `PPLA00008`, sealing `picoplay-ps4.pkg`.
 
 ### 2. Desktop Target (Linux / PC)
 - **Compiler:** `g++` / `clang++` with standard POSIX libraries and SDL2.
 - **Window Management:** Creates an 800x800 resizable window centered on modern multi-monitor / ultra-wide setups.
-- **Fast Development Cycle:** Compile and run in under 2 seconds: `make desktop && ./platform/SDL2Desktop/pico8-ps4`.
+- **Fast Development Cycle:** Compile and run in under 2 seconds: `make desktop && ./platform/SDL2Desktop/picoplay`.

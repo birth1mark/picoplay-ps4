@@ -2,7 +2,7 @@
 ROOT_SOURCES	?= source
 ROOT_INCLUDES	?= include
 
-export APP_TITLE	= PICO-8 PS4
+export APP_TITLE	= PicoPlay
 export APP_AUTHOR	= birth1mark
 export V_MAJOR	= 0
 export V_MINOR	= 0

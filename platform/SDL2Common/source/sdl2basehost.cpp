@@ -201,9 +201,9 @@ void Host::oneTimeSetup(Audio* audio){
     }
 
 #if defined(__PS4__) || defined(__ORBIS__)
-    window = SDL_CreateWindow("PICO-8 PS4", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowWidth, _windowHeight, _windowFlags);
+    window = SDL_CreateWindow("PicoPlay", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowWidth, _windowHeight, _windowFlags);
 #else
-    window = SDL_CreateWindow("PICO-8 PS4", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _windowWidth, _windowHeight, _windowFlags);
+    window = SDL_CreateWindow("PicoPlay - 8-Bit Fantasy Arcade", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _windowWidth, _windowHeight, _windowFlags);
 #endif
 	if (!window) 
     { 

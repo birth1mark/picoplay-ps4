@@ -31,7 +31,7 @@ libs/z8lua/*.o
 libs/z8lua/liblua.a
 platform/SDL2Desktop/obj/*.o
 platform/SDL2Desktop/*.d
-platform/SDL2Desktop/pico8-ps4
+platform/SDL2Desktop/picoplay
 platform/SDL2Desktop/fake08
 platform/SDL2Desktop/FAKE08
 platform/SDL2Desktop/FAKE08-master
@@ -53,7 +53,7 @@ platform/libretro/obj/
 # PS4 build artifacts
 *.oelf
 *.pkg
-pico8-ps4
+picoplay-ps4
 platform/ps4/build/
 platform/ps4/eboot.bin
 platform/ps4/*.oelf
@@ -61,7 +61,7 @@ pkg/eboot.bin
 
 # Desktop build artifacts
 platform/SDL2Desktop/build/
-pico8-ps4-*.tar.gz
+picoplay-*.tar.gz
 
 .DS_Store
 

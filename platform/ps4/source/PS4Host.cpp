@@ -80,11 +80,11 @@ static uint32_t prevPadButtons = 0;
 static SDL_Event event;
 static SDL_Point touchLocation = { 128 / 2, 128 / 2 };
 
-static string _ps4SettingsDir = "/data/pico8-ps4";
-static string _ps4SettingsPrefix = "/data/pico8-ps4/";
-static string _ps4CartDir = "/data/pico8-ps4/carts";
+static string _ps4SettingsDir = "/data/picoplay";
+static string _ps4SettingsPrefix = "/data/picoplay/";
+static string _ps4CartDir = "/data/picoplay/carts";
 static string _ps4CustomBiosLua = 
-    "cartpath = \"/data/pico8-ps4/carts/\"\n"
+    "cartpath = \"/data/picoplay/carts/\"\n"
     "selectbtn = \"x\"\n"
     "pausebtn = \"options\"";
 
@@ -96,11 +96,11 @@ static void ensure_dir(const char* path) {
 }
 
 Host::Host(int windowWidth, int windowHeight) {
-    // Ensure PICO-8 PS4 internal storage paths exist on PS4 /data partition
+    // Ensure PicoPlay internal storage paths exist on PS4 /data partition
     ensure_dir("/data");
-    ensure_dir("/data/pico8-ps4");
-    ensure_dir("/data/pico8-ps4/cdata");
-    ensure_dir("/data/pico8-ps4/carts");
+    ensure_dir("/data/picoplay");
+    ensure_dir("/data/picoplay/cdata");
+    ensure_dir("/data/picoplay/carts");
 
     setPlatformParams(
         WINDOW_SIZE_X,

@@ -1,4 +1,4 @@
-Thank you for your contribution to **PICO-8 PS4**!
+Thank you for your contribution to **PicoPlay**!
 
 Before submitting this Pull Request, please make sure:
 

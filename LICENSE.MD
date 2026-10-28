@@ -1,5 +1,5 @@
-# PICO-8 PS4 — Licenses & Attributions
-- Website: https://github.com/birth1mark/pico8-ps4
+# PicoPlay — Licenses & Attributions
+- Website: https://github.com/birth1mark/picoplay-ps4
 - License: MIT
 
 ## FAKE-08 (Core Emulator Engine)

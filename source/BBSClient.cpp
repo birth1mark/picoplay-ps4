@@ -58,7 +58,7 @@ static bool ps4_http_init() {
 static bool ps4_http_download(const char* url, const char* destPath) {
     if (!ps4_http_init()) return false;
 
-    int tpl = sceHttpCreateTemplate(s_libhttpCtxId, "Mozilla/5.0 (PLAYSTATION 4; PICO-8 PS4)", ORBIS_HTTP_VERSION_1_1, 1);
+    int tpl = sceHttpCreateTemplate(s_libhttpCtxId, "Mozilla/5.0 (PLAYSTATION 4; PicoPlay)", ORBIS_HTTP_VERSION_1_1, 1);
     if (tpl < 0) return false;
 
     sceHttpsSetSslCallback(tpl, skipSslCallback, NULL);
@@ -197,7 +197,7 @@ bool BBSClient::DownloadCart(const string& url, const string& destinationPath) {
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_file_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "PICO8-PS4/1.0 (PS4 Homebrew by birth1mark)");
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "PicoPlay/1.0 (Homebrew by birth1mark)");
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 15L);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);

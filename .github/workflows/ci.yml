@@ -1,4 +1,4 @@
-name: PICO-8 PS4 CI
+name: PicoPlay CI
 
 on:
   push:
@@ -28,8 +28,8 @@ jobs:
       - name: Upload Desktop Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: pico8-ps4-desktop-linux-x86_64
-          path: platform/SDL2Desktop/pico8-ps4
+          name: picoplay-desktop-linux-x86_64
+          path: platform/SDL2Desktop/picoplay
 
   ps4-build:
     name: PlayStation 4 Build & Package
@@ -60,7 +60,7 @@ jobs:
           cp -d /tmp/libssl_extracted/usr/lib/x86_64-linux-gnu/lib* $HOME/toolchains/lib/
           rm -rf /tmp/libssl.deb /tmp/libssl_extracted
 
-      - name: Build PS4 eboot.bin & pico8-ps4.pkg
+      - name: Build PS4 eboot.bin & picoplay-ps4.pkg
         run: |
           export OPENORBIS="$HOME/toolchains/OpenOrbis/PS4Toolchain"
           export OO_PS4_TOOLCHAIN="$OPENORBIS"
@@ -70,7 +70,7 @@ jobs:
       - name: Upload PS4 Package Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: pico8-ps4-pkg
+          name: picoplay-ps4-pkg
           path: |
-            pico8-ps4.pkg
+            picoplay-ps4.pkg
             pkg/eboot.bin

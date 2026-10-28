@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Generates project.gp4 for PICO-8 PS4 PKG creation.
+Generates project.gp4 for PicoPlay PS4 PKG creation.
 Scans pkg/ directory for eboot.bin, sce_sys files, and bundled starter carts.
 """
 import os
 import glob
 import sys
 
-def generate_gp4(pkg_dir="pkg", title_id="PICO00008"):
-    content_id = f"IV0000-{title_id}_00-PICO8PS4PLAYER00"
+def generate_gp4(pkg_dir="pkg", title_id="PPLA00008"):
+    content_id = f"IV0000-{title_id}_00-PICOPLAYPS400000"
     
     files = []
     # Standard mandatory OpenOrbis PS4 PKG files
