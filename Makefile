@@ -2,8 +2,8 @@
 ROOT_SOURCES	?= source
 ROOT_INCLUDES	?= include
 
-export APP_TITLE	= FAKE-08
-export APP_AUTHOR	= jtothebell
+export APP_TITLE	= PICO-8 PS4
+export APP_AUTHOR	= birth1mark
 export V_MAJOR	= 0
 export V_MINOR	= 0
 export V_PATCH	= 2

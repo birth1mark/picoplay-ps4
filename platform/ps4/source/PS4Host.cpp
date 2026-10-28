@@ -79,11 +79,11 @@ static uint32_t prevPadButtons = 0;
 static SDL_Event event;
 static SDL_Point touchLocation = { 128 / 2, 128 / 2 };
 
-static string _ps4SettingsDir = "/data/orbis8";
-static string _ps4SettingsPrefix = "/data/orbis8/";
-static string _ps4CartDir = "/data/orbis8/carts";
+static string _ps4SettingsDir = "/data/pico8-ps4";
+static string _ps4SettingsPrefix = "/data/pico8-ps4/";
+static string _ps4CartDir = "/data/pico8-ps4/carts";
 static string _ps4CustomBiosLua = 
-    "cartpath = \"/data/orbis8/carts/\"\n"
+    "cartpath = \"/data/pico8-ps4/carts/\"\n"
     "selectbtn = \"x\"\n"
     "pausebtn = \"options\"";
 
@@ -95,11 +95,11 @@ static void ensure_dir(const char* path) {
 }
 
 Host::Host(int windowWidth, int windowHeight) {
-    // Ensure Orbis8 internal storage paths exist on PS4 /data partition
+    // Ensure PICO-8 PS4 internal storage paths exist on PS4 /data partition
     ensure_dir("/data");
-    ensure_dir("/data/orbis8");
-    ensure_dir("/data/orbis8/cdata");
-    ensure_dir("/data/orbis8/carts");
+    ensure_dir("/data/pico8-ps4");
+    ensure_dir("/data/pico8-ps4/cdata");
+    ensure_dir("/data/pico8-ps4/carts");
 
     // Check if USB storage with pico8 carts is plugged in
     struct stat st;
@@ -294,7 +294,7 @@ vector<string> Host::listcarts() {
     DIR *dir;
     struct dirent *ent;
 
-    // Scan primary cart directory (/data/orbis8/carts or USB)
+    // Scan primary cart directory (/data/pico8-ps4/carts or USB)
     if ((dir = opendir(_cartDirectory.c_str())) != NULL) {
         while ((ent = readdir(dir)) != NULL) {
             if (ent->d_name[0] == '.') continue;

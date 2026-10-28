@@ -346,7 +346,7 @@ function classic_draw()
 		-- ARCADE HEADER
 		rectfill(0, 0, 127, 10, 1)
 		line(0, 11, 127, 11, 12)
-		print("ORBIS-8 ARCADE", 36, 3, 7)
+		print("PICO-8 PS4 ARCADE", 30, 3, 7)
 
 		-- Power Indicator LED
 		local led_col = (t % 40 < 20) and 11 or 3
@@ -417,7 +417,7 @@ function classic_draw()
 		-- BBS STORE VIEW
 		rectfill(0, 0, 127, 10, 1)
 		line(0, 11, 127, 11, 11)
-		print("ORBIS-8 BBS STORE", 30, 3, 7)
+		print("PICO-8 BBS STORE", 32, 3, 7)
 
 		circfill(120, 5, 2, 11)
 		pset(120, 5, 7)

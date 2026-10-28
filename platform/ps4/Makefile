@@ -1,5 +1,5 @@
 #---------------------------------------------------------------------------------
-# Orbis8 - PICO-8 Fantasy Console Player for PlayStation 4
+# PICO-8 PS4 - PICO-8 Fantasy Console Player for PlayStation 4
 # OpenOrbis Toolchain Makefile
 #---------------------------------------------------------------------------------
 
@@ -13,13 +13,13 @@ ifndef OPENORBIS
     endif
 endif
 
-APP_TITLE       := Orbis8 - PICO-8 Player
-APP_TITLE_ID    := ORBS00008
+APP_TITLE       := PICO-8 PS4
+APP_TITLE_ID    := PICO00008
 APP_VERSION     := 01.00
 APP_AUTHOR      := birth1mark
-CONTENT_ID      := IV0000-$(APP_TITLE_ID)_00-ORBIS8PICO800000
+CONTENT_ID      := IV0000-$(APP_TITLE_ID)_00-PICO8PS4PLAYER00
 
-TARGET          := orbis8
+TARGET          := pico8-ps4
 BUILD           := build
 OUTPUT          := $(TARGET).elf
 EBOOT           := eboot.bin
@@ -120,7 +120,7 @@ $(EBOOT): $(TARGET).elf
 	@echo "==> PS4 Build finished: $(EBOOT)"
 
 pkg: all
-	@echo "==> Packaging Orbis8 Fake PKG..."
+	@echo "==> Packaging PICO-8 PS4 Fake PKG..."
 	@mkdir -p ../../pkg/sce_sys/about ../../pkg/sce_module ../../pkg/carts
 	@cp -r ../../starter_carts/* ../../pkg/carts/ 2>/dev/null || true
 	@test -f ../../pkg/sce_sys/about/right.sprx || cp $(OPENORBIS)/samples/SDL2/sce_sys/about/right.sprx ../../pkg/sce_sys/about/right.sprx

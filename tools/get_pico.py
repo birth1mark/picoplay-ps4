@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Orbis8 BBS Cartridge Explorer & Downloader
+PICO-8 PS4 BBS Cartridge Explorer & Downloader
 Allows searching, browsing and downloading public PICO-8 carts from Lexaloffle BBS.
 """
 import sys
@@ -8,7 +8,7 @@ import os
 import re
 import urllib.request
 
-USER_AGENT = "Orbis8/1.0 (PS4 Homebrew by birth1mark)"
+USER_AGENT = "PICO8-PS4/1.0 (PS4 Homebrew by birth1mark)"
 DEST_DIR = os.path.expanduser("~/p8carts")
 
 def get_cart_url(lid):
@@ -35,7 +35,7 @@ def download_cart(lid, filename=None):
             data = resp.read()
             f.write(data)
         print(f"[✓] Saved successfully to: {dest_path} ({len(data)} bytes)")
-        print(f"[✓] Game is now ready in your Orbis8 library!")
+        print(f"[✓] Game is now ready in your PICO-8 PS4 library!")
         return True
     except Exception as e:
         print(f"[✗] Failed to download {lid}: {e}")
@@ -57,7 +57,7 @@ def list_recent():
             author = (re.search(r"by <a [^>]*>(.*?)</a>", item) or [None, "Community"])[1].strip()
             thumb = (re.search(r"/bbs/thumbs/(?:pico8_|pico64_)?([a-zA-Z0-9_\-]+)\.png", item) or [None, "N/A"])[1]
             print(f"{title[:34]:<35} {author[:17]:<18} {thumb}")
-        print("\nTo download any of these to your Orbis8 library, run:")
+        print("\nTo download any of these to your PICO-8 PS4 library, run:")
         print("  python3 tools/get_pico.py get <LID>")
     except Exception as e:
         print(f"[✗] Error fetching feed: {e}")
@@ -70,4 +70,4 @@ if __name__ == "__main__":
     else:
         print("Usage:")
         print("  python3 tools/get_pico.py list         - List recent community games")
-        print("  python3 tools/get_pico.py get <LID>    - Download game by LID to Orbis8")
+        print("  python3 tools/get_pico.py get <LID>    - Download game by LID to PICO-8 PS4")

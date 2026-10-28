@@ -7,14 +7,14 @@ import struct
 import sys
 import os
 
-def create_sfo(title_id="ORBS00008", title="Orbis8 - PICO-8 Player", version="01.00"):
+def create_sfo(title_id="PICO00008", title="PICO-8 PS4", version="01.00"):
     # SFO Entry Formats:
     #   0x0404 = Integer (uint32, 4 bytes)
     #   0x0204 = Utf8 (null-terminated UTF-8 string; val_len = len(str) + 1, padded to max_len in data table)
     FMT_INT  = 0x0404
     FMT_UTF8 = 0x0204
 
-    content_id = f"IV0000-{title_id}_00-ORBIS8PICO800000"
+    content_id = f"IV0000-{title_id}_00-PICO8PS4PLAYER00"
     entries = {
         "APP_TYPE":           (FMT_INT,  4,   1),
         "APP_VER":            (FMT_UTF8, 8,   version),
