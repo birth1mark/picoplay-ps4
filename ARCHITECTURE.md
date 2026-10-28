@@ -175,8 +175,8 @@ D-Pad Left  / Left Stick Left   ───►    Bit 0 (0x01) : Left
 D-Pad Right / Left Stick Right  ───►    Bit 1 (0x02) : Right
 D-Pad Up    / Left Stick Up     ───►    Bit 2 (0x04) : Up
 D-Pad Down  / Left Stick Down   ───►    Bit 3 (0x08) : Down
-Cross (✕) / Square (▢)          ───►    Bit 4 (0x10) : Button 🅾 / Action 1
-Circle (◯)                      ───►    Bit 5 (0x20) : Button ❎ / Action 2
+Circle (◯)  / Square (▢)        ───►    Bit 4 (0x10) : Button 🅾 (P8_KEY_O)
+Cross (✕)                       ───►    Bit 5 (0x20) : Button ❎ (P8_KEY_X)
 Options Button                  ───►    Bit 6 (0x40) : Pause Menu
 Triangle (△)                    ───►    Host Action  : Cycle Aspect Ratio
 L1 + R1 + Options               ───►    Host Action  : Force Return to PS4 Menu
@@ -226,4 +226,4 @@ Cartridges on the Lexaloffle BBS are stored deterministically on the public CDN 
 ### 2. Desktop Target (Linux / PC)
 - **Compiler:** `g++` / `clang++` with standard POSIX libraries and SDL2.
 - **Window Management:** Creates an 800x800 resizable window centered on modern multi-monitor / ultra-wide setups.
-- **Fast Development Cycle:** Compile and run in under 2 seconds: `make desktop && ./platform/SDL2Desktop/FAKE08`.
+- **Fast Development Cycle:** Compile and run in under 2 seconds: `make desktop && ./platform/SDL2Desktop/pico8-ps4`.

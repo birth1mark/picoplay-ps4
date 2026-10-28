@@ -1,8 +1,12 @@
-# FAKE-08
+# PICO-8 PS4 — Licenses & Attributions
+- Website: https://github.com/birth1mark/pico8-ps4
+- License: MIT
+
+## FAKE-08 (Core Emulator Engine)
 - Website: https://github.com/jtothebell/fake-08
 - License: MIT
 
-**Note: this software is NOT related to Pico-8, or othwerwise related to or supported by Lexaloffle Software
+**Note: this software is NOT related to PICO-8, or otherwise affiliated with or supported by Lexaloffle Games LLP.**
 
 
 ## Z8lua

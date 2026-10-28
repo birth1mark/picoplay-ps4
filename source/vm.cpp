@@ -453,7 +453,10 @@ bool Vm::LoadCart(std::string filename, bool loadBiosOnFail){
     Logger_Write("Loading cart %s\n", filename.c_str());
     CloseCart();
 
-    // If the filename is an absolute path, update the cart directory
+#if !defined(__PS4__) && !defined(__ORBIS__)
+    // If the filename is an absolute path on desktop/handhelds, update the cart directory.
+    // On PS4, keep _cartDirectory pointed to writable /data/pico8-ps4/carts so BBS downloads
+    // never attempt to write into read-only /app0/carts or USB mounts.
     if (isAbsolutePath(filename)) {
         std::string dir = getDirectory(filename);
         if (dir.length() > 0) {
@@ -463,6 +466,7 @@ bool Vm::LoadCart(std::string filename, bool loadBiosOnFail){
             SetCartList(_host->listcarts());
         }
     }
+#endif
 
     Logger_Write("Calling Cart Constructor\n");
     auto cartDir = _host->getCartDirectory();

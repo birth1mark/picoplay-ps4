@@ -35,8 +35,8 @@ using namespace std;
 SDL_Event event;
 
 
-string _desktopSdl2SettingsDir = "fake08";
-string _desktopSdl2SettingsPrefix = "fake08/";
+string _desktopSdl2SettingsDir = "pico8-ps4";
+string _desktopSdl2SettingsPrefix = "pico8-ps4/";
 string _desktopSdl2customBiosLua = "cartpath = \"~/p8carts/\"\n"
         "selectbtn = \"z\"\n"
         "pausebtn = \"esc\"\n"

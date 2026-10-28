@@ -58,11 +58,11 @@ Pre-built packages are ready to install on any jailbroken PlayStation 4 running 
 | DualShock 4 Button | PICO-8 Virtual Input | Function |
 | :--- | :--- | :--- |
 | **D-Pad / Left Stick** | `Left / Right / Up / Down` | Directional Movement |
-| **Cross (✕)** | `🅾 (Button 4 / Action 1)` | Jump / Primary Action |
-| **Circle (◯)** | `❎ (Button 5 / Action 2)` | Dash / Secondary Action |
-| **Square (▢)** | `❎ (Alternate)` | Secondary Action |
+| **Cross (✕)** | `❎ (Button 5 / P8_KEY_X)` | Select / Play in Arcade Menu · Action 2 in Game |
+| **Circle (◯)** | `🅾 (Button 4 / P8_KEY_O)` | Switch Tab / Back in Menu · Action 1 in Game |
+| **Square (▢)** | `🅾 (Button 4 / P8_KEY_O)` | Alternate Action 1 in Game |
 | **Triangle (△)** | *Toggle Scaling* | Switch between Pixel-Perfect and Stretched 16:9 |
-| **Options** | `Pause / Menu` | In-game PICO-8 Menu |
+| **Options** | `Pause / Menu` | In-game PICO-8 Pause Menu |
 | **L1 + R1 + Options** | *Exit* | Quick Exit back to PS4 Home Screen |
 
 ---
@@ -98,7 +98,7 @@ Requires `g++`, `SDL2`, and `libcurl`:
 ```bash
 # Compile and run on your desktop
 make desktop
-./platform/SDL2Desktop/FAKE08
+./platform/SDL2Desktop/pico8-ps4
 ```
 
 ### 2. PS4 Executable (`eboot.bin`)

@@ -1,6 +1,7 @@
-Thank you for your contribution to the Fake-08 
-Before submitting this PR, please make sure:
+Thank you for your contribution to **PICO-8 PS4**!
 
-- [ ] This pull request is for a single Feature or BugFix
-- [ ] Your code builds clean without any errors on all platforms
-- [ ] You have added unit tests (if this is a change to the core Pico 8 emulator)
+Before submitting this Pull Request, please make sure:
+
+- [ ] This Pull Request is focused on a single feature or bug fix
+- [ ] Your code compiles cleanly for both Desktop (`make desktop`) and PlayStation 4 (`make pkg`)
+- [ ] You have tested your changes with PICO-8 cartridges (`.p8` and `.p8.png`)

@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <set>
 
 using namespace std;
 
@@ -100,14 +101,6 @@ Host::Host(int windowWidth, int windowHeight) {
     ensure_dir("/data/pico8-ps4");
     ensure_dir("/data/pico8-ps4/cdata");
     ensure_dir("/data/pico8-ps4/carts");
-
-    // Check if USB storage with pico8 carts is plugged in
-    struct stat st;
-    if (stat("/mnt/usb0/pico8", &st) == 0 && S_ISDIR(st.st_mode)) {
-        _ps4CartDir = "/mnt/usb0/pico8";
-    } else if (stat("/mnt/usb1/pico8", &st) == 0 && S_ISDIR(st.st_mode)) {
-        _ps4CartDir = "/mnt/usb1/pico8";
-    }
 
     setPlatformParams(
         WINDOW_SIZE_X,
@@ -291,39 +284,25 @@ InputState_t Host::scanInput() {
 
 vector<string> Host::listcarts() {
     vector<string> carts;
+    set<string> seenNames;
     DIR *dir;
     struct dirent *ent;
 
-    // Scan primary cart directory (/data/pico8-ps4/carts or USB)
-    if ((dir = opendir(_cartDirectory.c_str())) != NULL) {
-        while ((ent = readdir(dir)) != NULL) {
-            if (ent->d_name[0] == '.') continue;
-            if (isCartFile(ent->d_name)) {
-                carts.push_back(_cartDirectory + "/" + ent->d_name);
-            }
-        }
-        closedir(dir);
-    }
+    const char* scanDirs[] = {
+        _cartDirectory.c_str(),
+        "/app0/carts",
+        "/mnt/usb0/pico8",
+        "/mnt/usb1/pico8"
+    };
 
-    // Also scan bundled application carts (/app0/carts)
-    if (_cartDirectory != "/app0/carts" && (dir = opendir("/app0/carts")) != NULL) {
-        while ((ent = readdir(dir)) != NULL) {
-            if (ent->d_name[0] == '.') continue;
-            if (isCartFile(ent->d_name)) {
-                carts.push_back(string("/app0/carts/") + ent->d_name);
-            }
-        }
-        closedir(dir);
-    }
-
-    // Also scan USB storage if not already scanned
-    const char* usbPaths[] = { "/mnt/usb0/pico8", "/mnt/usb1/pico8" };
-    for (const char* usbPath : usbPaths) {
-        if (_cartDirectory != usbPath && (dir = opendir(usbPath)) != NULL) {
+    for (const char* dirPath : scanDirs) {
+        if ((dir = opendir(dirPath)) != NULL) {
             while ((ent = readdir(dir)) != NULL) {
                 if (ent->d_name[0] == '.') continue;
-                if (isCartFile(ent->d_name)) {
-                    carts.push_back(string(usbPath) + "/" + ent->d_name);
+                string name = ent->d_name;
+                if (isCartFile(name) && seenNames.find(name) == seenNames.end()) {
+                    seenNames.insert(name);
+                    carts.push_back(string(dirPath) + "/" + name);
                 }
             }
             closedir(dir);

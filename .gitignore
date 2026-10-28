@@ -31,6 +31,7 @@ libs/z8lua/*.o
 libs/z8lua/liblua.a
 platform/SDL2Desktop/obj/*.o
 platform/SDL2Desktop/*.d
+platform/SDL2Desktop/pico8-ps4
 platform/SDL2Desktop/fake08
 platform/SDL2Desktop/FAKE08
 platform/SDL2Desktop/FAKE08-master

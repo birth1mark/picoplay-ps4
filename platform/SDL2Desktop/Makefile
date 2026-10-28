@@ -6,7 +6,7 @@
 # INCLUDES is a list of directories containing header files
 #
 #---------------------------------------------------------------------------------
-TARGET		:=	FAKE08
+TARGET		:=	pico8-ps4
 BUILD		:=	build
 SOURCES		:=	${SOURCES} ../SDL2Common/source source
 INCLUDES	:=	${INCLUDES}

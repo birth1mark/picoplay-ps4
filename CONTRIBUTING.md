@@ -27,10 +27,10 @@ To test and iterate quickly without turning on your PS4, compile the desktop SDL
 sudo pacman -S sdl2 libcurl-gnutls
 
 # Compile desktop build
-make sdl2
+make desktop
 
 # Run with a cartridge
-./platform/SDL2Desktop/FAKE08 starter_carts/celeste.p8
+./platform/SDL2Desktop/pico8-ps4 starter_carts/celeste.p8
 ```
 
 ### 3. PS4 Toolchain Build

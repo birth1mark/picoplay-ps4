@@ -73,7 +73,7 @@ The arcade frontend is designed to be streamlined, distraction-free, and 100% fa
 - **Desktop Build:**
   ```bash
   make desktop
-  ./platform/SDL2Desktop/FAKE08
+  ./platform/SDL2Desktop/pico8-ps4
   ```
 - **PS4 Executable (`eboot.bin`):**
   ```bash

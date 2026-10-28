@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pico8-ps4-desktop-linux-x86_64
-          path: platform/SDL2Desktop/FAKE08
+          path: platform/SDL2Desktop/pico8-ps4
 
   ps4-build:
     name: PlayStation 4 Build & Package
