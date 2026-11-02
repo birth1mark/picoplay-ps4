@@ -7,7 +7,7 @@ import struct
 import sys
 import os
 
-def create_sfo(title_id="PPLA00008", title="PicoPlay", version="01.00"):
+def create_sfo(title_id="PPLA00008", title="PicoPlay", version="01.01"):
     # SFO Entry Formats:
     #   0x0404 = Integer (uint32, 4 bytes)
     #   0x0204 = Utf8 (null-terminated UTF-8 string; val_len = len(str) + 1, padded to max_len in data table)

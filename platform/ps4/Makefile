@@ -15,7 +15,7 @@ endif
 
 APP_TITLE       := PicoPlay
 APP_TITLE_ID    := PPLA00008
-APP_VERSION     := 01.00
+APP_VERSION     := 01.01
 APP_AUTHOR      := birth1mark
 CONTENT_ID      := IV0000-$(APP_TITLE_ID)_00-PICOPLAYPS400000
 

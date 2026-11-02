@@ -28,7 +28,7 @@
 Pre-built packages are ready to install on any jailbroken PlayStation 4 running firmware **5.05 up to 11.00+** (GoldHEN / Mira / HEN):
 
 ### 📥 1. Download the PKG
-* **Pre-built Releases:** Download the latest `picoplay-ps4.pkg` directly from the [**GitHub Releases**](https://github.com/birth1mark/picoplay-ps4/releases) page.
+* **Direct PKG Download (v1.01):** [**⬇️ Download `picoplay-ps4.pkg`**](https://github.com/birth1mark/picoplay-ps4/releases/latest/download/picoplay-ps4.pkg) *(or view all [**GitHub Releases**](https://github.com/birth1mark/picoplay-ps4/releases))*
 * **Or Build It Locally:** Run `make pkg` to generate `picoplay-ps4.pkg` in the project root in seconds.
 
 ### 🕹️ 2. Step-by-Step PS4 Installation
