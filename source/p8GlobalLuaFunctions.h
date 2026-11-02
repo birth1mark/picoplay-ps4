@@ -572,10 +572,8 @@ function __z8_run_cart(cart_code)
                 end
                 if _draw then
                     _draw()
-                    flip()
-                else
-                    yield()
                 end
+                yield()
             end
         end
     ]]

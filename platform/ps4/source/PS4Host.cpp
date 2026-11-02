@@ -196,13 +196,34 @@ InputState_t Host::scanInput() {
         }
     }
 
-    // Read DualShock 4 state directly via scePadReadState (guarantees analog stick & buttons work on PS4)
+    // Read DualShock 4 state directly via scePadReadState (guarantees analog stick & buttons work on PS4
+    // without OpenOrbis SDL2's PS4_JoystickDetect calling scePadOpen on every frame)
     if (ps4PadHandle < 0) {
+        static bool padInitialized = false;
+        if (!padInitialized) {
+            sceUserServiceInitialize(NULL);
+            scePadInit();
+            padInitialized = true;
+        }
         OrbisUserServiceUserId userId = ORBIS_USER_SERVICE_USER_ID_INVALID;
         if (sceUserServiceGetInitialUser(&userId) == 0 && userId != ORBIS_USER_SERVICE_USER_ID_INVALID) {
             ps4PadHandle = scePadGetHandle(userId, 0, 0);
             if (ps4PadHandle < 0) {
                 ps4PadHandle = scePadOpen(userId, 0, 0, NULL);
+            }
+        }
+        if (ps4PadHandle < 0) {
+            OrbisUserServiceLoginUserIdList userIdList;
+            if (sceUserServiceGetLoginUserIdList(&userIdList) == 0) {
+                for (int i = 0; i < 4; i++) {
+                    if (userIdList.userId[i] != ORBIS_USER_SERVICE_USER_ID_INVALID) {
+                        ps4PadHandle = scePadGetHandle(userIdList.userId[i], 0, 0);
+                        if (ps4PadHandle < 0) {
+                            ps4PadHandle = scePadOpen(userIdList.userId[i], 0, 0, NULL);
+                        }
+                        if (ps4PadHandle >= 0) break;
+                    }
+                }
             }
         }
     }

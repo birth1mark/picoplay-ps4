@@ -71,7 +71,11 @@ bool audioInitialized = false;
 void postFlipFunction(){
     // We're done rendering, so we end the frame here.
     SDL_UnlockTexture(texture);
-    SDL_RenderCopyEx(renderer, texture, &SrcR, &DestR, textureAngle, NULL, flip);
+    if (textureAngle == 0 && flip == SDL_FLIP_NONE) {
+        SDL_RenderCopy(renderer, texture, &SrcR, &DestR);
+    } else {
+        SDL_RenderCopyEx(renderer, texture, &SrcR, &DestR, textureAngle, NULL, flip);
+    }
 
     SDL_RenderPresent(renderer);
 }
@@ -190,7 +194,10 @@ void Host::setPlatformParams(
 
 void Host::oneTimeSetup(Audio* audio){
 #if defined(__PS4__) || defined(__ORBIS__)
-    uint32_t initFlags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_TIMER | SDL_INIT_EVENTS;
+    // Omit SDL_INIT_JOYSTICK on PS4: OpenOrbis SDL2's PS4_JoystickDetect calls
+    // sceUserServiceGetLoginUserIdList + scePadOpen across 4 user slots on every
+    // SDL_PollEvent call. PS4Host reads DualShock 4 directly via scePadReadState.
+    uint32_t initFlags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_EVENTS;
 #else
     uint32_t initFlags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER | SDL_INIT_EVENTS;
 #endif
@@ -240,12 +247,14 @@ void Host::oneTimeSetup(Audio* audio){
     _audio = audio;
     audioSetup();
 
+#if !defined(__PS4__) && !defined(__ORBIS__)
     joystickCount = SDL_NumJoysticks();
     for (int i = 0; i < joystickCount; i++) {
 		if (SDL_JoystickOpen(i) == NULL) {
 			Logger_Write("Failed to open joystick %d: %s\n", i, SDL_GetError());
 		}
     }
+#endif
 
     last_time = 0;
     now_time = 0;
@@ -347,6 +356,12 @@ bool Host::shouldQuit() {
 }
 
 void Host::waitForTargetFps(){
+#if defined(__PS4__) || defined(__ORBIS__)
+    // On PS4, SDL_UpdateWindowSurface / PS4_UpdateWindowFramebuffer already blocks
+    // on hardware 60Hz VSYNC via sceVideoOutSubmitFlip + WaitOnFlip (sceKernelWaitEqueue).
+    // Any additional SDL_Delay here risks crossing the next VSYNC boundary and dropping to 30Hz.
+    return;
+#else
     now_time = SDL_GetTicks();
     if (last_time == 0) {
         last_time = now_time;
@@ -363,10 +378,109 @@ void Host::waitForTargetFps(){
         }
     }
     last_time = SDL_GetTicks();
+#endif
 }
 
 
 void Host::drawFrame(uint8_t* picoFb, uint8_t* screenPaletteMap, uint8_t drawMode){
+#if defined(__PS4__) || defined(__ORBIS__)
+    // Fast direct-to-window-surface scanline scaler for PS4:
+    // Bypasses OpenOrbis SDL2's unoptimized (-O0) SW_RenderCopyEx / SDLgfx_rotateSurface
+    // and avoids full-screen 1920x1080 SDL_RenderClear (8.3 MB) on every frame.
+    SDL_Surface* winSurface = SDL_GetWindowSurface(window);
+    if (winSurface && winSurface->pixels && DestR.w > 0 && DestR.h > 0) {
+        static SDL_Rect prevDestR = {0, 0, 0, 0};
+        static int clearFrames = 2;
+        if (prevDestR.x != DestR.x || prevDestR.y != DestR.y ||
+            prevDestR.w != DestR.w || prevDestR.h != DestR.h) {
+            prevDestR = DestR;
+            clearFrames = 2;
+        }
+        if (clearFrames > 0) {
+            SDL_FillRect(winSurface, NULL, 0);
+            clearFrames--;
+        }
+
+        // Pre-map the 16 active PICO-8 screen palette colors to the window surface pixel format
+        uint32_t mappedPalette[16];
+        for (int i = 0; i < 16; i++) {
+            Color col = _paletteColors[screenPaletteMap[i] & 0x8f];
+            mappedPalette[i] = SDL_MapRGB(winSurface->format, col.Red, col.Green, col.Blue);
+        }
+
+        // Unpack 128x128 4-bit framebuffer (8,192 bytes) in a single pass
+        uint32_t raw128[PicoScreenWidth * PicoScreenHeight];
+        for (int i = 0; i < (PicoScreenWidth * PicoScreenHeight) / 2; i++) {
+            uint8_t byte = picoFb[i];
+            raw128[i * 2]     = mappedPalette[byte & 0x0f];
+            raw128[i * 2 + 1] = mappedPalette[byte >> 4];
+        }
+
+        // Apply PICO-8 drawMode (0x5f2c) on the compact 128x128 grid if active
+        const uint32_t* src128 = raw128;
+        uint32_t transformed128[PicoScreenWidth * PicoScreenHeight];
+        if (drawMode != 0) {
+            for (int y = 0; y < PicoScreenHeight; y++) {
+                for (int x = 0; x < PicoScreenWidth; x++) {
+                    int sx = x;
+                    int sy = y;
+                    switch (drawMode) {
+                        case 1:   sx = x >> 1; break;
+                        case 2:   sy = y >> 1; break;
+                        case 3:   sx = x >> 1; sy = y >> 1; break;
+                        case 4:   if (x >= 64) sx = 127 - x; break;
+                        case 5:   if (y >= 64) sy = 127 - y; break;
+                        case 6:
+                        case 7:   if (x >= 64) sx = 127 - x; if (y >= 64) sy = 127 - y; break;
+                        case 129: sx = 127 - x; break;
+                        case 130: sy = 127 - y; break;
+                        case 131: sx = 127 - x; sy = 127 - y; break;
+                        case 133: sx = y; sy = 127 - x; break;
+                        case 134: sx = 127 - x; sy = 127 - y; break;
+                        case 135: sx = 127 - y; sy = x; break;
+                        default:  break;
+                    }
+                    transformed128[y * PicoScreenWidth + x] = raw128[sy * PicoScreenWidth + sx];
+                }
+            }
+            src128 = transformed128;
+        }
+
+        // Precompute horizontal source X lookup table
+        int srcXTable[2048];
+        int dstW = std::min(DestR.w, std::min(2048, winSurface->w - DestR.x));
+        int dstH = std::min(DestR.h, winSurface->h - DestR.y);
+        for (int dx = 0; dx < dstW; dx++) {
+            srcXTable[dx] = (dx * PicoScreenWidth) / DestR.w;
+        }
+
+        // Scale 128 rows to DestR.h: only 128 unique scanlines are computed;
+        // duplicate rows are memcpy'd directly from the L1-cached previous scanline.
+        int prevSy = -1;
+        uint32_t* prevDstRow = nullptr;
+        uint8_t* dstBase = (uint8_t*)winSurface->pixels + DestR.y * winSurface->pitch + DestR.x * sizeof(uint32_t);
+        size_t rowBytes = (size_t)dstW * sizeof(uint32_t);
+
+        for (int dy = 0; dy < dstH; dy++) {
+            int sy = (dy * PicoScreenHeight) / DestR.h;
+            uint32_t* dstRow = (uint32_t*)(dstBase + dy * winSurface->pitch);
+            if (sy == prevSy && prevDstRow != nullptr) {
+                memcpy(dstRow, prevDstRow, rowBytes);
+            } else {
+                const uint32_t* srcRow = &src128[sy * PicoScreenWidth];
+                for (int dx = 0; dx < dstW; dx++) {
+                    dstRow[dx] = srcRow[srcXTable[dx]];
+                }
+                prevSy = sy;
+                prevDstRow = dstRow;
+            }
+        }
+
+        SDL_UpdateWindowSurface(window);
+        return;
+    }
+#endif
+
     //clear screen to all black
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
