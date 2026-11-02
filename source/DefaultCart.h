@@ -104,6 +104,10 @@ function classic_init()
 	if __bbs_listfeatured then
 		bbs_items = __bbs_listfeatured()
 	end
+
+	-- Smooth and responsive repeat rates for arcade navigation
+	poke(0x5f5c, 20) -- 333ms initial repeat delay
+	poke(0x5f5d, 8)  -- 133ms repeat interval (~7.5 carts/sec)
 end
 
 function classic_refreshlists()
@@ -116,6 +120,10 @@ function classic_refreshlists()
 	if __bbs_listfeatured then
 		bbs_items = __bbs_listfeatured()
 	end
+
+	-- Smooth and responsive repeat rates for arcade navigation
+	poke(0x5f5c, 20) -- 333ms initial repeat delay
+	poke(0x5f5d, 8)  -- 133ms repeat interval (~7.5 carts/sec)
 end
 
 function classic_update()
@@ -137,10 +145,8 @@ function classic_update()
 				cidx -= 1
 				if cidx < 1 then cidx = numcarts end
 			end
-		end
-
-		-- Right (1) / Down (3): Next Cartridge (with wrap-around)
-		if btnp(1) or btnp(3) then
+		elseif btnp(1) or btnp(3) then
+			-- Right (1) / Down (3): Next Cartridge (with wrap-around)
 			if numcarts > 0 then
 				cidx += 1
 				if cidx > numcarts then cidx = 1 end
@@ -173,8 +179,7 @@ function classic_update()
 			if bbs_idx <= bbs_scroll then
 				bbs_scroll = bbs_idx - 1
 			end
-		end
-		if btnp(3) then
+		elseif btnp(3) then
 			bbs_idx = min(total_items, bbs_idx + 1)
 			if bbs_idx > bbs_scroll + 5 then
 				bbs_scroll = bbs_idx - 5

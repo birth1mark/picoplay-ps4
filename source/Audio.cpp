@@ -386,7 +386,10 @@ void Audio::update_sfx_state(sfx_state& cur_sfx, z8::synth_param& new_synth,
     if (cur_sfx.sfx == -1) return;
 
     int const index = cur_sfx.sfx;
-    assert(index >= 0 && index < 64);
+    if (index < 0 || index >= 64) {
+        cur_sfx.sfx = -1;
+        return;
+    }
     struct sfx const& sfx_data = _memory->sfx[index];
 
     // Speed must be 1—255 otherwise the SFX is invalid
@@ -607,7 +610,8 @@ void Audio::FillAudioBuffer(void *audioBuffer, size_t offset, size_t size){
                 double const offset_per_second = 22050.0 / 183.0;
                 double const offset_per_frame = offset_per_second * inv_frames_per_second;
                 _audioState._musicChannel.offset += offset_per_frame;
-                _audioState._musicChannel.fade_volume += (float)(_audioState._musicChannel.fade_volume_step * inv_frames_per_second);
+                double const music_inv_fps = 1.0 / 22050.0;
+                _audioState._musicChannel.fade_volume += (float)(_audioState._musicChannel.fade_volume_step * music_inv_fps);
                 _audioState._musicChannel.fade_volume = clamp(_audioState._musicChannel.fade_volume, 0.f, 1.f);
 
                 if (_audioState._musicChannel.fade_volume_step < 0 && _audioState._musicChannel.fade_volume <= 0)
@@ -618,14 +622,24 @@ void Audio::FillAudioBuffer(void *audioBuffer, size_t offset, size_t size){
                 {
                     int16_t next_pattern = _audioState._musicChannel.pattern + 1;
                     int16_t next_count = _audioState._musicChannel.count + 1;
-                    if (_memory->songs[_audioState._musicChannel.pattern].getStop())
+                    if (_audioState._musicChannel.pattern >= 0 && _audioState._musicChannel.pattern < 64 &&
+                        _memory->songs[_audioState._musicChannel.pattern].getStop())
                     {
                         next_pattern = -1;
                         next_count = -1;
                     }
-                    else if (_memory->songs[_audioState._musicChannel.pattern].getLoop())
-                        while (--next_pattern > 0 && !_memory->songs[next_pattern].getStart())
-                            ;
+                    else if (_audioState._musicChannel.pattern >= 0 && _audioState._musicChannel.pattern < 64 &&
+                             _memory->songs[_audioState._musicChannel.pattern].getLoop())
+                    {
+                        int16_t loop_target = -1;
+                        for (int16_t p = next_pattern - 1; p >= 0; --p) {
+                            if (p >= 0 && p < 64 && _memory->songs[p].getStart()) {
+                                loop_target = p;
+                                break;
+                            }
+                        }
+                        next_pattern = (loop_target >= 0) ? loop_target : 0;
+                    }
 
                     _audioState._musicChannel.count = next_count;
                     set_music_pattern(next_pattern);
@@ -636,7 +650,10 @@ void Audio::FillAudioBuffer(void *audioBuffer, size_t offset, size_t size){
             if (channel_state.main_sfx.sfx == -1 && channel_state.sfx_music != -1 && !is_pause)
             {
                 int const index = channel_state.sfx_music;
-                assert(index >= 0 && index < 64);
+                if (index < 0 || index >= 64) {
+                    channel_state.sfx_music = -1;
+                    continue;
+                }
                 struct sfx const& sfx_data = _memory->sfx[index];
 
                 // compute offset to start the sfx to
@@ -827,7 +844,8 @@ void Audio::FillMonoAudioBuffer(void *audioBuffer, size_t offset, size_t size){
                 double const offset_per_second = 22050.0 / 183.0;
                 double const offset_per_frame = offset_per_second * inv_frames_per_second;
                 _audioState._musicChannel.offset += offset_per_frame;
-                _audioState._musicChannel.fade_volume += (float)(_audioState._musicChannel.fade_volume_step * inv_frames_per_second);
+                double const music_inv_fps = 1.0 / 22050.0;
+                _audioState._musicChannel.fade_volume += (float)(_audioState._musicChannel.fade_volume_step * music_inv_fps);
                 _audioState._musicChannel.fade_volume = clamp(_audioState._musicChannel.fade_volume, 0.f, 1.f);
 
                 if (_audioState._musicChannel.fade_volume_step < 0 && _audioState._musicChannel.fade_volume <= 0)
@@ -838,14 +856,24 @@ void Audio::FillMonoAudioBuffer(void *audioBuffer, size_t offset, size_t size){
                 {
                     int16_t next_pattern = _audioState._musicChannel.pattern + 1;
                     int16_t next_count = _audioState._musicChannel.count + 1;
-                    if (_memory->songs[_audioState._musicChannel.pattern].getStop())
+                    if (_audioState._musicChannel.pattern >= 0 && _audioState._musicChannel.pattern < 64 &&
+                        _memory->songs[_audioState._musicChannel.pattern].getStop())
                     {
                         next_pattern = -1;
                         next_count = -1;
                     }
-                    else if (_memory->songs[_audioState._musicChannel.pattern].getLoop())
-                        while (--next_pattern > 0 && !_memory->songs[next_pattern].getStart())
-                            ;
+                    else if (_audioState._musicChannel.pattern >= 0 && _audioState._musicChannel.pattern < 64 &&
+                             _memory->songs[_audioState._musicChannel.pattern].getLoop())
+                    {
+                        int16_t loop_target = -1;
+                        for (int16_t p = next_pattern - 1; p >= 0; --p) {
+                            if (p >= 0 && p < 64 && _memory->songs[p].getStart()) {
+                                loop_target = p;
+                                break;
+                            }
+                        }
+                        next_pattern = (loop_target >= 0) ? loop_target : 0;
+                    }
 
                     _audioState._musicChannel.count = next_count;
                     set_music_pattern(next_pattern);
@@ -856,7 +884,10 @@ void Audio::FillMonoAudioBuffer(void *audioBuffer, size_t offset, size_t size){
             if (channel_state.main_sfx.sfx == -1 && channel_state.sfx_music != -1 && !is_pause)
             {
                 int const index = channel_state.sfx_music;
-                assert(index >= 0 && index < 64);
+                if (index < 0 || index >= 64) {
+                    channel_state.sfx_music = -1;
+                    continue;
+                }
                 struct sfx const& sfx_data = _memory->sfx[index];
 
                 bool want_play = true;

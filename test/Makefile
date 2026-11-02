@@ -26,7 +26,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fexceptions
 #-std=gnu++11 was used before... not sure of difference
 
 
-LDFLAGS	:= $(LIBS)
+LDFLAGS	:= $(LIBS) -lcurl
 
 
 #---------------------------------------------------------------------------------

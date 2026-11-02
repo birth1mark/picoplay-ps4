@@ -11,8 +11,11 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <errno.h>
+#include <filesystem>
 
 #include "doctest.h"
+#include <iostream>
+#include "stubhost.h"
 #include "../libs/lodepng/lodepng.h"
 
 #include "../source/vm.h"
@@ -575,6 +578,68 @@ string checkCart_wrapper(string cartDirectory, string cart)
 }
 */
 
+
+TEST_CASE("Slipways execution and touch mouse click") {
+    StubHost* host = new StubHost();
+    Vm* vm = new Vm(host);
+    
+    std::string rel_path = "../starter_carts/slipways.p8.png";
+    FILE* fp = fopen(rel_path.c_str(), "rb");
+    if (!fp) {
+        rel_path = "../android/app/src/full/assets/carts/slipways.p8.png";
+    } else {
+        fclose(fp);
+    }
+    std::string path = std::filesystem::absolute(rel_path).string();
+    Cart* cart = new Cart(path, "");
+    std::cout << "extcmd pos: " << (int)cart->LuaString.find("extcmd") << std::endl;
+    delete cart;
+
+    vm->LoadCart(path, false);
+    vm->vm_run();
+
+    for (int i = 0; i < 60; i++) {
+        vm->Step();
+    }
+    std::cout << "Stepped 60 frames. Bios error: " << vm->GetBiosError() << std::endl;
+
+    // Simulate mouse click on the screen like a touch
+    host->stubMouse(64, 64, 1);
+    for (int i = 0; i < 30; i++) {
+        vm->Step();
+    }
+    std::cout << "After click Bios error: " << vm->GetBiosError() << std::endl;
+
+    CHECK(vm->GetBiosError() == "");
+
+    delete vm;
+    delete host;
+}
+
+TEST_CASE("Pause Menu Normalizes Camera and Palette") {
+    Host* host = new Host();
+    Vm* vm = new Vm(host);
+    string cartCode = "pico-8 cartridge // http://www.pico-8.com\nversion 8\n__lua__\nfunction _draw()\n  camera(-50, -100)\n  pal(7, 0)\n  fillp(0xaaaa)\nend\n";
+    vm->LoadCart(reinterpret_cast<const unsigned char*>(cartCode.c_str()), cartCode.size(), false);
+    vm->vm_run();
+
+    for (int i = 0; i < 30; i++) {
+        vm->Step();
+    }
+
+    // Trigger pause menu
+    vm->togglePauseMenu();
+    CHECK(vm->IsPaused() == true);
+
+    // Step while paused
+    for (int i = 0; i < 5; i++) {
+        CHECK(vm->Step() == true);
+    }
+    CHECK(vm->GetBiosError() == "");
+
+    delete vm;
+    delete host;
+}
 
 TEST_CASE("Loading and running carts") {
     vector<string> carts;

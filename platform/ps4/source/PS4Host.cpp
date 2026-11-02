@@ -11,6 +11,8 @@
 #include <vector>
 #include <string>
 #include <set>
+#include <algorithm>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -79,6 +81,8 @@ static uint32_t prevPadButtons = 0;
 
 static SDL_Event event;
 static SDL_Point touchLocation = { 128 / 2, 128 / 2 };
+static float cursorX = 64.0f;
+static float cursorY = 64.0f;
 
 static string _ps4SettingsDir = "/data/picoplay";
 static string _ps4SettingsPrefix = "/data/picoplay/";
@@ -235,6 +239,29 @@ InputState_t Host::scanInput() {
 
             lDown = (btns & ORBIS_PAD_BUTTON_L1) != 0;
             rDown = (btns & ORBIS_PAD_BUTTON_R1) != 0;
+
+            // Mouse cursor emulation via DualShock 4 Touchpad and Right Analog Stick
+            if (padData.touch.fingers > 0) {
+                cursorX = std::clamp((padData.touch.touch[0].x * 127.0f) / 1919.0f, 0.0f, 127.0f);
+                cursorY = std::clamp((padData.touch.touch[0].y * 127.0f) / 941.0f, 0.0f, 127.0f);
+            }
+            int rx = (int)padData.rightStick.x - 128;
+            int ry = (int)padData.rightStick.y - 128;
+            if (abs(rx) > 24) {
+                cursorX = std::clamp(cursorX + (rx / 128.0f) * 2.5f, 0.0f, 127.0f);
+            }
+            if (abs(ry) > 24) {
+                cursorY = std::clamp(cursorY + (ry / 128.0f) * 2.5f, 0.0f, 127.0f);
+            }
+            touchLocation.x = (int)cursorX;
+            touchLocation.y = (int)cursorY;
+
+            if ((btns & (ORBIS_PAD_BUTTON_TOUCH_PAD | ORBIS_PAD_BUTTON_R2 | ORBIS_PAD_BUTTON_R3)) || padData.analogButtons.r2 > 64) {
+                mouseBtnState |= 1;
+            }
+            if ((btns & (ORBIS_PAD_BUTTON_L2 | ORBIS_PAD_BUTTON_L3)) || padData.analogButtons.l2 > 64) {
+                mouseBtnState |= 2;
+            }
         }
     }
 

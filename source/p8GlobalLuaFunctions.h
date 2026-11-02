@@ -223,24 +223,43 @@ __f08_menu_items = {
 
 __f08_menu_selected = 0
 
-function __f08_menu_update()
-    if btnp(3) and __f08_menu_selected < #__f08_menu_items then
-        repeat
-            __f08_menu_selected = __f08_menu_selected + 1
-        until __f08_menu_items[__f08_menu_selected][1] ~= nil
-    end
+function __z8_reset_menu()
+    __f08_menu_items = {
+        [0] = {"continue", __togglepausemenu},
+        {nil, nil},
+        {nil, nil},
+        {nil, nil},
+        {nil, nil},
+        {nil, nil},
+        {"reset cart", __resetcart},
+        {"exit to menu", __loaddefaultcart},
+        {"exit to settings", __loadsettingscart}
+    }
+    __f08_menu_selected = 0
+end
 
+function __f08_menu_update()
     if btnp(2) and __f08_menu_selected > 0 then
         repeat
             __f08_menu_selected = __f08_menu_selected - 1
-        until __f08_menu_items[__f08_menu_selected][1] ~= nil
+        until __f08_menu_selected <= 0 or (__f08_menu_items[__f08_menu_selected] and __f08_menu_items[__f08_menu_selected][1] ~= nil)
+    elseif btnp(3) and __f08_menu_selected < #__f08_menu_items then
+        repeat
+            __f08_menu_selected = __f08_menu_selected + 1
+        until __f08_menu_selected >= #__f08_menu_items or (__f08_menu_items[__f08_menu_selected] and __f08_menu_items[__f08_menu_selected][1] ~= nil)
     end
 
-    if btnp(0) or btnp(1) or btnp(4) or btnp(5) then
+    local is_action = btnp(4) or btnp(5)
+    local is_horizontal = btnp(0) or btnp(1)
+    local is_custom = (__f08_menu_selected >= 1 and __f08_menu_selected <= 5)
+
+    -- Standard items (continue, reset, exit) ONLY activate on action buttons (O/X).
+    -- Custom cart items (1-5) can also respond to horizontal arrows (Left/Right).
+    if is_action or (is_horizontal and is_custom) then
 		local bval = 0
 		local allowreturn = false
 		
-		if btnp(4) or btnp(5) then
+		if is_action then
 			bval = 16+32+64
 			allowreturn = true
 		else
@@ -249,7 +268,6 @@ function __f08_menu_update()
 			elseif btnp(1) then 
 				bval = 2			
 			end
-			
 		end
 		
         toexec = __f08_menu_items[__f08_menu_selected]
@@ -266,6 +284,12 @@ function __f08_menu_update()
 end
 
 function __f08_menu_draw()
+    camera(0, 0)
+    clip()
+    pal()
+    fillp(0)
+    color(7)
+
     local menuwidth = 82
     local itemcount = 0
     for i=0, 8, 1 do
@@ -282,24 +306,23 @@ function __f08_menu_draw()
     rect(menux+1, menuy+1, menux + menuwidth-1, menuy + menuheight-1, 7)
     local itemx = menux + 8
     local itemy = menuy + 6
-    local itemidx = 0
 
     for i=0, 8, 1 do
         item = __f08_menu_items[i]
         if item and item[1] then
-            print(item[1], itemx, itemy, 7)
+            local is_sel = (i == __f08_menu_selected)
+            local textcol = is_sel and 10 or 7
+            print(item[1], itemx, itemy, textcol)
             
             --draw selection indicator
-            if itemidx == __f08_menu_selected then
-                line(itemx-5, itemy, itemx-5, itemy+4, 7)
-                line(itemx-4, itemy+1, itemx-4, itemy+3, 7)
-                pset(itemx-3, itemy+2, 7)
+            if is_sel then
+                line(itemx-5, itemy, itemx-5, itemy+4, 10)
+                line(itemx-4, itemy+1, itemx-4, itemy+3, 10)
+                pset(itemx-3, itemy+2, 10)
             end
 
             itemy = itemy + 10
         end
-
-        itemidx = itemidx + 1
     end
 end
 
@@ -564,6 +587,7 @@ function __z8_run_cart(cart_code)
 
         __z8_reset_state()
         __z8_reset_cartdata()
+        __z8_reset_menu()
 
         -- Load cart and run the user-provided functions. Note that if the
         -- cart code returns before the end, our added code will not be
@@ -602,6 +626,10 @@ function __z8_tick()
 
     -- Check if pause menu is active
     if __ispaused() then
+        camera(0, 0)
+        clip()
+        pal()
+        fillp(0)
         _update_buttons()
         __f08_menu_update()
         __f08_menu_draw()
@@ -625,6 +653,7 @@ function __z8_tick()
         __z8_stopped = false -- FIXME: what now?
     elseif not ret then
         printh(tostr(err))
+        if debug and debug.traceback then printh(tostr(debug.traceback(__z8_loop))) end
         -- Return to menu on error
         __loaddefaultcart()
         return -1

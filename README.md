@@ -64,6 +64,8 @@ Pre-built packages are ready to install on any jailbroken PlayStation 4 running 
 | **Circle (◯)** | `🅾 (Button 4 / P8_KEY_O)` | Switch Tab / Back in Menu · Action 1 in Game |
 | **Square (▢)** | `🅾 (Button 4 / P8_KEY_O)` | Alternate Action 1 in Game |
 | **Triangle (△)** | *Toggle Scaling* | Switch between Pixel-Perfect and Stretched 16:9 |
+| **Right Stick / Touchpad** | `Mouse X / Y (stat 32, 33)` | Cursor Movement in Mouse-Driven Games (*Slipways*) |
+| **R2 / Touchpad Click / L2** | `Mouse Click (stat 34)` | Left / Right Click in Mouse-Driven Games |
 | **Options** | `Pause / Menu` | In-game PICO-8 Pause Menu |
 | **L1 + R1 + Options** | *Exit* | Quick Exit back to PS4 Home Screen |
 

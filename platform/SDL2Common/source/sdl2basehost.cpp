@@ -348,18 +348,21 @@ bool Host::shouldQuit() {
 
 void Host::waitForTargetFps(){
     now_time = SDL_GetTicks();
+    if (last_time == 0) {
+        last_time = now_time;
+        return;
+    }
     frame_time = now_time - last_time;
-	last_time = now_time;
 
-
-	//sleep for remainder of time
-	if (frame_time < targetFrameTimeMs) {
-		uint32_t msToSleep = targetFrameTimeMs - frame_time;
-        
-        SDL_Delay(msToSleep);
-
-		last_time += msToSleep;
-	}
+    // Smooth frame pacing: avoid sleeping tiny durations (< 3ms) that clash with VSYNC
+    if (frame_time < targetFrameTimeMs) {
+        uint32_t msToSleep = targetFrameTimeMs - frame_time;
+        if (msToSleep >= 3) {
+            // Wake up slightly before VSYNC deadline to avoid dropping frames on high refresh displays
+            SDL_Delay(msToSleep - 1);
+        }
+    }
+    last_time = SDL_GetTicks();
 }
 
 
