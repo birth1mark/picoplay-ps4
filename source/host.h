@@ -126,6 +126,7 @@ class Host {
     void playFilledAudioBuffer();
 
     void oneTimeCleanup();
+    void platformCleanup();
 
     double deltaTMs();
 

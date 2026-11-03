@@ -48,7 +48,7 @@ void Host::oneTimeSetup(Audio* audio){
 }
 
 void Host::oneTimeCleanup(){
-
+    platformCleanup();
 }
 
 void Host::setTargetFps(int targetFps){

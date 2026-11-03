@@ -396,6 +396,8 @@ void Host::oneTimeCleanup(){
 
     audioCleanup();
 
+    platformCleanup();
+
     C3D_TexDelete(pico_tex);
 
 	linearFree(pico_tex);

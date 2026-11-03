@@ -18,6 +18,15 @@ using namespace std;
 
 CSimpleIniA settingsIni;
 
+// Default destructor shared by all platforms.
+Host::~Host() {
+}
+
+// Default no-op platform cleanup hook. Platforms that need to release
+// OS-level resources (e.g. PS4 pad handle) override this.
+void Host::platformCleanup() {
+}
+
 std::string defaultIni =
 "[settings]\n"
 "stretch = 1\n"

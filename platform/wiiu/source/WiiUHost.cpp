@@ -274,6 +274,8 @@ void Host::oneTimeCleanup(){
     
     audioCleanup();
 
+    platformCleanup();
+
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
