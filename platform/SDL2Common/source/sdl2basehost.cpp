@@ -408,8 +408,9 @@ void Host::drawFrame(uint8_t* picoFb, uint8_t* screenPaletteMap, uint8_t drawMod
             mappedPalette[i] = SDL_MapRGB(winSurface->format, col.Red, col.Green, col.Blue);
         }
 
-        // Unpack 128x128 4-bit framebuffer (8,192 bytes) in a single pass
-        uint32_t raw128[PicoScreenWidth * PicoScreenHeight];
+        // Unpack 128x128 4-bit framebuffer (8,192 bytes) in a single pass.
+        // Use static buffers to avoid 64 KB stack allocations every frame.
+        static uint32_t raw128[PicoScreenWidth * PicoScreenHeight];
         for (int i = 0; i < (PicoScreenWidth * PicoScreenHeight) / 2; i++) {
             uint8_t byte = picoFb[i];
             raw128[i * 2]     = mappedPalette[byte & 0x0f];
@@ -418,7 +419,7 @@ void Host::drawFrame(uint8_t* picoFb, uint8_t* screenPaletteMap, uint8_t drawMod
 
         // Apply PICO-8 drawMode (0x5f2c) on the compact 128x128 grid if active
         const uint32_t* src128 = raw128;
-        uint32_t transformed128[PicoScreenWidth * PicoScreenHeight];
+        static uint32_t transformed128[PicoScreenWidth * PicoScreenHeight];
         if (drawMode != 0) {
             for (int y = 0; y < PicoScreenHeight; y++) {
                 for (int x = 0; x < PicoScreenWidth; x++) {
@@ -477,6 +478,18 @@ void Host::drawFrame(uint8_t* picoFb, uint8_t* screenPaletteMap, uint8_t drawMod
         }
 
         SDL_UpdateWindowSurface(window);
+
+        // Frame budget instrumentation: log frames that exceed the 16.6 ms budget
+        // so we can spot carts that starve the VM / audio synth.
+        static uint32_t lastFrameTick = 0;
+        uint32_t nowTick = SDL_GetTicks();
+        if (lastFrameTick != 0) {
+            uint32_t delta = nowTick - lastFrameTick;
+            if (delta > 20) {
+                Logger_Write("PS4 frame budget exceeded: %u ms", delta);
+            }
+        }
+        lastFrameTick = nowTick;
         return;
     }
 #endif
