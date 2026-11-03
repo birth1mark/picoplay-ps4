@@ -4,10 +4,13 @@
 [![Release](https://img.shields.io/github/v/release/birth1mark/picoplay-ps4?label=Latest%20PKG%20Release&color=ff004d)](https://github.com/birth1mark/picoplay-ps4/releases/latest)
 [![Platform](https://img.shields.io/badge/Platform-PlayStation%204-003791.svg)](https://github.com/OpenOrbis)
 [![SDK](https://img.shields.io/badge/SDK-OpenOrbis%20Toolchain-blue.svg)](https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain)
+[![Trailer](https://img.shields.io/badge/YouTube-Gameplay%20Trailer-red.svg?logo=youtube)](https://www.youtube.com/shorts/e_c7nUM1crY)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.MD)
 [![Firmware](https://img.shields.io/badge/PS4%20Firmware-5.05%20--%2011.00-brightgreen.svg)](https://github.com/birth1mark/picoplay-ps4/releases)
 
 **PicoPlay** brings the magical world of PICO-8 indie retrogaming natively to the PlayStation 4. Powered by an optimized C++ SDL2 engine, it delivers pixel-perfect 60 FPS gameplay, full DualShock 4 controller integration, an in-app BBS Store to download cartridges on-the-fly, and an out-of-the-box arcade experience with celebrated community titles like *Celeste Classic*.
+
+> 🎬 **Watch the 30-Second Showcase:** [**PlayStation 4 Gameplay & DualShock 4 Controls (YouTube Shorts)**](https://www.youtube.com/shorts/e_c7nUM1crY)
 
 > 📱 **Also Available on Android:** Looking for the mobile & handheld edition? Check out [**PicoPlay Android (`birth1mark/picoplay-android`)**](https://github.com/birth1mark/picoplay-android) with a custom Pocket Touch Gamepad, Bluetooth controller support, and Google Play Store compliance.
 
