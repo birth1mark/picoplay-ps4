@@ -65,3 +65,4 @@ picoplay-*.tar.gz
 
 .DS_Store
 
+.aider*

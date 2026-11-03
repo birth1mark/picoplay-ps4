@@ -480,18 +480,6 @@ void Host::drawFrame(uint8_t* picoFb, uint8_t* screenPaletteMap, uint8_t drawMod
         }
 
         SDL_UpdateWindowSurface(window);
-
-        // Frame budget instrumentation: log frames that exceed the 16.6 ms budget
-        // so we can spot carts that starve the VM / audio synth.
-        static uint32_t lastFrameTick = 0;
-        uint32_t nowTick = SDL_GetTicks();
-        if (lastFrameTick != 0) {
-            uint32_t delta = nowTick - lastFrameTick;
-            if (delta > 20) {
-                Logger_Write("PS4 frame budget exceeded: %u ms", delta);
-            }
-        }
-        lastFrameTick = nowTick;
         return;
     }
 #endif

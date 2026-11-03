@@ -288,18 +288,21 @@ InputState_t Host::scanInput() {
             rDown = (btns & ORBIS_PAD_BUTTON_R1) != 0;
 
             // Mouse cursor emulation via DualShock 4 Touchpad and Right Analog Stick.
-            // Touchpad uses RELATIVE motion (delta from previous touch position) so that
-            // point-and-click games behave like a desktop mouse instead of jumping the
-            // cursor to the absolute touch location.
+            // Touchpad uses relative motion with sensitivity scaling and jitter filtering.
             if (padData.touch.fingers > 0) {
                 int tx = (int)padData.touch.touch[0].x;
                 int ty = (int)padData.touch.touch[0].y;
                 if (prevTouchValid) {
-                    // Scale touchpad pixels (1920x943) to PICO-8 pixels (128x128)
-                    float dx = ((tx - prevTouchX) * 127.0f) / 1919.0f;
-                    float dy = ((ty - prevTouchY) * 127.0f) / 941.0f;
-                    cursorX = std::clamp(cursorX + dx, 0.0f, 127.0f);
-                    cursorY = std::clamp(cursorY + dy, 0.0f, 127.0f);
+                    int rawDx = tx - prevTouchX;
+                    int rawDy = ty - prevTouchY;
+                    // Jitter deadzone: ignore micro-tremors under 3 units
+                    if (abs(rawDx) >= 3 || abs(rawDy) >= 3) {
+                        const float TOUCH_SENSITIVITY = 2.75f;
+                        float dx = ((rawDx * 127.0f) / 1919.0f) * TOUCH_SENSITIVITY;
+                        float dy = ((rawDy * 127.0f) / 941.0f) * TOUCH_SENSITIVITY;
+                        cursorX = std::clamp(cursorX + dx, 0.0f, 127.0f);
+                        cursorY = std::clamp(cursorY + dy, 0.0f, 127.0f);
+                    }
                 }
                 prevTouchX = tx;
                 prevTouchY = ty;
