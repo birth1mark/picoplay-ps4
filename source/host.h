@@ -98,6 +98,7 @@ class Host {
 
     public:
     Host(int windowWidth = 0, int windowHeight = 0);
+    ~Host();
 
     void setUpPaletteColors();
     void oneTimeSetup(Audio* audio);
