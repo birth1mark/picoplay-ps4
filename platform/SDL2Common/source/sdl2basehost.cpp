@@ -274,6 +274,9 @@ void Host::oneTimeSetup(Audio* audio){
     mouseOffsetY = DestR.y;
 }
 
+void Host::platformCleanup() {
+}
+
 void Host::oneTimeCleanup(){
     saveSettingsIni();
 

@@ -47,6 +47,9 @@ void Host::oneTimeSetup(Audio* audio){
 
 }
 
+void Host::platformCleanup() {
+}
+
 void Host::oneTimeCleanup(){
     platformCleanup();
 }
