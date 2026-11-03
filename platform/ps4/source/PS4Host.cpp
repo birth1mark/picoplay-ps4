@@ -74,10 +74,17 @@ enum OrbisSdlJoyButton {
 
 // Analog joystick dead zone (0..255 centered at 128 -> deadzone 32 around 128)
 const int PAD_STICK_DEAD_ZONE = 32;
+// Retry scePadOpen at most once every N frames if the pad is not yet available
+const int PAD_RETRY_INTERVAL_FRAMES = 60;
 static int jxDir = 0;
 static int jyDir = 0;
 static int ps4PadHandle = -1;
 static uint32_t prevPadButtons = 0;
+static int padRetryCountdown = 0;
+// Previous touchpad coordinates for relative-motion cursor emulation
+static bool prevTouchValid = false;
+static int prevTouchX = 0;
+static int prevTouchY = 0;
 
 static SDL_Event event;
 static SDL_Point touchLocation = { 128 / 2, 128 / 2 };
@@ -216,25 +223,33 @@ InputState_t Host::scanInput() {
             scePadInit();
             padInitialized = true;
         }
-        OrbisUserServiceUserId userId = ORBIS_USER_SERVICE_USER_ID_INVALID;
-        if (sceUserServiceGetInitialUser(&userId) == 0 && userId != ORBIS_USER_SERVICE_USER_ID_INVALID) {
-            ps4PadHandle = scePadGetHandle(userId, 0, 0);
-            if (ps4PadHandle < 0) {
-                ps4PadHandle = scePadOpen(userId, 0, 0, NULL);
+        // Throttle retries so we don't hammer the pad service every frame
+        if (padRetryCountdown > 0) {
+            padRetryCountdown--;
+        } else {
+            OrbisUserServiceUserId userId = ORBIS_USER_SERVICE_USER_ID_INVALID;
+            if (sceUserServiceGetInitialUser(&userId) == 0 && userId != ORBIS_USER_SERVICE_USER_ID_INVALID) {
+                ps4PadHandle = scePadGetHandle(userId, 0, 0);
+                if (ps4PadHandle < 0) {
+                    ps4PadHandle = scePadOpen(userId, 0, 0, NULL);
+                }
             }
-        }
-        if (ps4PadHandle < 0) {
-            OrbisUserServiceLoginUserIdList userIdList;
-            if (sceUserServiceGetLoginUserIdList(&userIdList) == 0) {
-                for (int i = 0; i < 4; i++) {
-                    if (userIdList.userId[i] != ORBIS_USER_SERVICE_USER_ID_INVALID) {
-                        ps4PadHandle = scePadGetHandle(userIdList.userId[i], 0, 0);
-                        if (ps4PadHandle < 0) {
-                            ps4PadHandle = scePadOpen(userIdList.userId[i], 0, 0, NULL);
+            if (ps4PadHandle < 0) {
+                OrbisUserServiceLoginUserIdList userIdList;
+                if (sceUserServiceGetLoginUserIdList(&userIdList) == 0) {
+                    for (int i = 0; i < 4; i++) {
+                        if (userIdList.userId[i] != ORBIS_USER_SERVICE_USER_ID_INVALID) {
+                            ps4PadHandle = scePadGetHandle(userIdList.userId[i], 0, 0);
+                            if (ps4PadHandle < 0) {
+                                ps4PadHandle = scePadOpen(userIdList.userId[i], 0, 0, NULL);
+                            }
+                            if (ps4PadHandle >= 0) break;
                         }
-                        if (ps4PadHandle >= 0) break;
                     }
                 }
+            }
+            if (ps4PadHandle < 0) {
+                padRetryCountdown = PAD_RETRY_INTERVAL_FRAMES;
             }
         }
     }
@@ -272,10 +287,25 @@ InputState_t Host::scanInput() {
             lDown = (btns & ORBIS_PAD_BUTTON_L1) != 0;
             rDown = (btns & ORBIS_PAD_BUTTON_R1) != 0;
 
-            // Mouse cursor emulation via DualShock 4 Touchpad and Right Analog Stick
+            // Mouse cursor emulation via DualShock 4 Touchpad and Right Analog Stick.
+            // Touchpad uses RELATIVE motion (delta from previous touch position) so that
+            // point-and-click games behave like a desktop mouse instead of jumping the
+            // cursor to the absolute touch location.
             if (padData.touch.fingers > 0) {
-                cursorX = std::clamp((padData.touch.touch[0].x * 127.0f) / 1919.0f, 0.0f, 127.0f);
-                cursorY = std::clamp((padData.touch.touch[0].y * 127.0f) / 941.0f, 0.0f, 127.0f);
+                int tx = (int)padData.touch.touch[0].x;
+                int ty = (int)padData.touch.touch[0].y;
+                if (prevTouchValid) {
+                    // Scale touchpad pixels (1920x943) to PICO-8 pixels (128x128)
+                    float dx = ((tx - prevTouchX) * 127.0f) / 1919.0f;
+                    float dy = ((ty - prevTouchY) * 127.0f) / 941.0f;
+                    cursorX = std::clamp(cursorX + dx, 0.0f, 127.0f);
+                    cursorY = std::clamp(cursorY + dy, 0.0f, 127.0f);
+                }
+                prevTouchX = tx;
+                prevTouchY = ty;
+                prevTouchValid = true;
+            } else {
+                prevTouchValid = false;
             }
             int rx = (int)padData.rightStick.x - 128;
             int ry = (int)padData.rightStick.y - 128;
