@@ -266,3 +266,7 @@ std::vector<std::string> Host::listdirs() {
     return dirs;
 }
 
+void Host::platformCleanup() {
+}
+
+

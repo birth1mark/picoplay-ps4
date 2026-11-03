@@ -18,8 +18,11 @@ using namespace std;
 
 CSimpleIniA settingsIni;
 
-// Default destructor shared by all platforms.
+// Default destructor and platform cleanup shared by all platforms.
 Host::~Host() {
+}
+
+__attribute__((weak)) void Host::platformCleanup() {
 }
 
 std::string defaultIni =
