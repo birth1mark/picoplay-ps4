@@ -99,6 +99,17 @@ static void ensure_dir(const char* path) {
     }
 }
 
+void Host::platformCleanup() {
+    // Release the DualShock 4 pad handle so the pad service is not leaked
+    // across app restarts / suspend-resume cycles.
+    if (ps4PadHandle >= 0) {
+        scePadClose(ps4PadHandle);
+        ps4PadHandle = -1;
+    }
+    prevPadButtons = 0;
+    padRetryCountdown = 0;
+}
+
 Host::Host(int windowWidth, int windowHeight) {
     // Ensure PicoPlay internal storage paths exist on PS4 /data partition
     ensure_dir("/data");
