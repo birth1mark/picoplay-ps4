@@ -2,6 +2,7 @@
 **A Native PICO-8 Fantasy Console Player & Arcade for PlayStation 4**
 
 [![Release](https://img.shields.io/github/v/release/birth1mark/picoplay-ps4?label=Latest%20PKG%20Release&color=ff004d)](https://github.com/birth1mark/picoplay-ps4/releases/latest)
+[![PKG-Zone](https://img.shields.io/badge/PKG--Zone-PPLA00008-blueviolet.svg?logo=playstation)](https://pkg-zone.com/details/PPLA00008)
 [![Platform](https://img.shields.io/badge/Platform-PlayStation%204-003791.svg)](https://github.com/OpenOrbis)
 [![SDK](https://img.shields.io/badge/SDK-OpenOrbis%20Toolchain-blue.svg)](https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain)
 [![Trailer](https://img.shields.io/badge/YouTube-Gameplay%20Trailer-red.svg?logo=youtube)](https://www.youtube.com/shorts/e_c7nUM1crY)
@@ -30,19 +31,23 @@
 
 Pre-built packages are ready to install on any jailbroken PlayStation 4 running firmware **5.05 up to 11.00+** (GoldHEN / Mira / HEN):
 
-### 📥 1. Download the PKG
-* **Direct PKG Download (v1.01):** [**⬇️ Download `picoplay-ps4.pkg`**](https://github.com/birth1mark/picoplay-ps4/releases/latest/download/picoplay-ps4.pkg) *(or view all [**GitHub Releases**](https://github.com/birth1mark/picoplay-ps4/releases))*
-* **Or Build It Locally:** Run `make pkg` to generate `picoplay-ps4.pkg` in the project root in seconds.
+### 🕹️ Option A: Direct PS4 Installation (via PKG-Zone / Homebrew Store)
+1. On your jailbroken PS4, launch the **Homebrew Store / PKG-Zone** or **Itemzflow** app.
+2. Search for **PicoPlay** (Title ID: `PPLA00008`).
+3. Press **Cross (✕)** to install directly to your PS4 hard drive — no PC or USB stick required!
+4. You can also view the official listing online at [**pkg-zone.com/details/PPLA00008**](https://pkg-zone.com/details/PPLA00008).
 
-### 🕹️ 2. Step-by-Step PS4 Installation
-1. Format a USB flash drive as **exFAT** or **FAT32**.
-2. Copy `picoplay-ps4.pkg` directly to the root of your USB drive (e.g. `X:\picoplay-ps4.pkg`).
-3. Insert the USB drive into your PS4.
-4. On your PS4 (with **GoldHEN** or **HEN** enabled), navigate to:
+### 📥 Option B: Manual USB Installation (Sideload via PKG)
+1. **Download the PKG:** [**⬇️ Download `picoplay-ps4.pkg` (v1.01)**](https://github.com/birth1mark/picoplay-ps4/releases/latest/download/picoplay-ps4.pkg) *(or view all [**GitHub Releases**](https://github.com/birth1mark/picoplay-ps4/releases))*.
+   * *Or Build It Locally:* Run `make pkg` to generate `picoplay-ps4.pkg` in seconds.
+2. Format a USB flash drive as **exFAT** or **FAT32**.
+3. Copy `picoplay-ps4.pkg` directly to the root of your USB drive (e.g. `X:\picoplay-ps4.pkg`).
+4. Insert the USB drive into your PS4.
+5. On your PS4 (with **GoldHEN** or **HEN** enabled), navigate to:
    * **Settings** ➔ **GoldHEN** ➔ **Package Installer**
    *(or **Settings** ➔ **Debug Settings** ➔ **Game** ➔ **Package Installer**)*
-5. Select `picoplay-ps4.pkg` and press **Cross (✕)** to install.
-6. Launch **PicoPlay** from the PS4 Home Screen (XMB) and start playing!
+6. Select `picoplay-ps4.pkg` and press **Cross (✕)** to install.
+7. Launch **PicoPlay** from the PS4 Home Screen (XMB) and start playing!
 
 ---
 
@@ -54,7 +59,7 @@ Pre-built packages are ready to install on any jailbroken PlayStation 4 running 
 - **Plug-and-Play USB Loading:** Automatically scans and launches `.p8` and `.p8.png` cartridges from USB drives (`/mnt/usb0/picoplay/`).
 - **Starter Classics Included:** Ships pre-bundled with open-source masterpieces ready to play without configuration.
 - **Persistent Save States:** Cartridge data and high scores automatically save to `/data/picoplay/cdata/`.
-- **Homebrew Store / PKG-Zone Compliant:** Built 100% clean-room with the community OpenOrbis toolchain (no copyrighted Sony SDK components).
+- **Published on PKG-Zone:** Officially available on the PS4 Homebrew Store ecosystem ([pkg-zone.com/details/PPLA00008](https://pkg-zone.com/details/PPLA00008)). Built 100% clean-room with the community OpenOrbis toolchain (no copyrighted Sony SDK components).
 
 ---
 
