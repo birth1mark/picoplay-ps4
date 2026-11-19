@@ -8,7 +8,7 @@
 [![Trailer](https://img.shields.io/badge/YouTube-Gameplay%20Trailer-red.svg?logo=youtube)](https://www.youtube.com/shorts/e_c7nUM1crY)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.MD)
 [![Firmware](https://img.shields.io/badge/PS4%20Firmware-5.05%20--%2011.00-brightgreen.svg)](https://github.com/birth1mark/picoplay-ps4/releases)
-[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-ff5e5b?logo=kofi&logoColor=white)](https://ko-fi.com/birth1mark)
+[![Buy me a coffee](https://img.shields.io/badge/☕_Buy_me_a_coffee-amber?style=flat-square)](https://donate.stripe.com/14AfZh8sC6bagMa0dte3e00)
 
 **PicoPlay** brings the magical world of PICO-8 indie retrogaming natively to the PlayStation 4. Powered by an optimized C++ SDL2 engine, it delivers pixel-perfect 60 FPS gameplay, full DualShock 4 controller integration, an in-app BBS Store to download cartridges on-the-fly, and an out-of-the-box arcade experience with celebrated community titles like *Celeste Classic*.
 
@@ -153,4 +153,4 @@ This project stands on the shoulders of brilliant creators and open-source contr
 
 ## ☕ Support
 
-If you enjoy playing PICO-8 classics natively on your PlayStation 4 with PicoPlay, consider [supporting on Ko-fi](https://ko-fi.com/birth1mark) to help fund ongoing development and homebrew releases!
+If you enjoy playing PICO-8 classics natively on your PlayStation 4 with PicoPlay, consider [buying me a coffee](https://donate.stripe.com/14AfZh8sC6bagMa0dte3e00) to help fund ongoing development and homebrew releases!
