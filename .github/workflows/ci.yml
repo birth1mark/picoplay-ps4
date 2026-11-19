@@ -3,14 +3,24 @@ name: PicoPlay CI
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - 'LICENSE.MD'
+      - '.gitignore'
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - 'LICENSE.MD'
+      - '.gitignore'
   workflow_dispatch:
 
 jobs:
   desktop-build:
     name: Desktop Build (Linux x86_64)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -19,8 +29,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libsdl2-dev libcurl4-openssl-dev
+          for i in 1 2 3; do sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=20 && break || sleep 5; done || true
+          sudo apt-get install -y --fix-missing -o Acquire::Retries=3 -o Acquire::http::Timeout=20 build-essential libsdl2-dev libcurl4-openssl-dev
 
       - name: Compile Desktop
         run: make desktop
@@ -33,7 +43,7 @@ jobs:
 
   ps4-build:
     name: PlayStation 4 Build & Package
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -42,8 +52,8 @@ jobs:
 
       - name: Install Toolchain Dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y clang lld imagemagick python3
+          for i in 1 2 3; do sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=20 && break || sleep 5; done || true
+          sudo apt-get install -y --fix-missing -o Acquire::Retries=3 -o Acquire::http::Timeout=20 clang lld imagemagick python3
 
       - name: Download & Setup OpenOrbis PS4 Toolchain
         run: |
